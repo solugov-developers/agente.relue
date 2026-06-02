@@ -115,7 +115,7 @@ export default function CommandChat() {
       <aside
         aria-hidden={!open}
         className={
-          "fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-[var(--line)] bg-white shadow-[-8px_0_30px_-12px_rgba(16,24,40,0.25)] transition-transform duration-300 ease-out will-change-transform sm:w-[420px] " +
+          "glass-panel fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-white/40 shadow-[-12px_0_40px_-16px_rgba(16,24,40,0.3)] transition-transform duration-300 ease-out will-change-transform sm:w-[420px] " +
           (open ? "translate-x-0" : "pointer-events-none translate-x-full")
         }
       >
@@ -147,7 +147,7 @@ export default function CommandChat() {
           </div>
         </div>
 
-        <div className="flex-1 space-y-3 overflow-y-auto bg-[var(--bg)] px-4 py-4">
+        <div className="flex-1 space-y-3 overflow-y-auto bg-transparent px-4 py-4">
           {msgs.length === 0 && (
             <div className="space-y-3">
               <p className="text-sm text-[var(--ink-soft)]">
@@ -173,7 +173,7 @@ export default function CommandChat() {
                   "inline-block max-w-full rounded-xl px-3.5 py-2 text-sm " +
                   (m.role === "user"
                     ? "bg-[var(--brand)] text-white"
-                    : "border border-[var(--line)] bg-white text-[var(--ink)]")
+                    : "border border-white/60 bg-white/80 text-[var(--ink)]")
                 }
               >
                 {m.role === "assistant" ? (
@@ -204,7 +204,7 @@ export default function CommandChat() {
             e.preventDefault();
             send(input);
           }}
-          className="flex gap-2 border-t border-[var(--line)] bg-white p-3"
+          className="flex gap-2 border-t border-white/40 bg-white/30 p-3"
         >
           <input
             ref={inputRef}

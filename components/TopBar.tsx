@@ -5,7 +5,7 @@ export type Kpi = { label: string; value: string; sub?: string; accent?: boolean
 export default function TopBar({ kpis, updatedAt }: { kpis: Kpi[]; updatedAt: string }) {
   const ask = () => window.dispatchEvent(new CustomEvent("relue-open"));
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10" style={{ background: "var(--topbar)" }}>
+    <header className="glass-dark sticky top-0 z-30 border-b border-white/10">
       <div className="mx-auto flex h-16 max-w-[1440px] items-stretch gap-5 px-5 text-white">
         <div className="flex flex-col justify-center pr-1">
           <div className="text-[11px] font-semibold tracking-[0.32em] text-blue-300">RELUE</div>
