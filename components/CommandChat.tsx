@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -45,7 +44,7 @@ export default function CommandChat() {
   }, []);
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 120);
+    if (open) setTimeout(() => inputRef.current?.focus(), 160);
   }, [open]);
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -100,131 +99,128 @@ export default function CommandChat() {
 
   return (
     <>
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="Abrir Relue"
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-[var(--brand)] px-4 py-3 text-sm font-medium text-white shadow-lg shadow-blue-600/25 hover:brightness-110"
-        >
-          <span>✦</span> Relue
-        </button>
-      )}
+      {/* botão flutuante */}
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Abrir Relue"
+        className={
+          "fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-[var(--brand)] px-4 py-3 text-sm font-medium text-white shadow-lg shadow-blue-600/25 transition hover:brightness-110 " +
+          (open ? "pointer-events-none opacity-0" : "opacity-100")
+        }
+      >
+        <span>✦</span> Relue
+      </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.aside
-            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-[var(--line)] bg-white shadow-[-8px_0_30px_-12px_rgba(16,24,40,0.25)] sm:w-[420px]"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className="flex items-center gap-3 border-b border-[var(--line)] px-4 py-3">
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--brand-soft)] text-[var(--brand)]">
-                ✦
-              </span>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold">Relue</div>
-                <div className="truncate text-xs text-[var(--muted)]">
-                  {busy ? "analisando a base…" : "inteligência de licitações de TI"}
-                </div>
-              </div>
-              <div className="ml-auto flex items-center gap-1">
-                {msgs.length > 0 && (
-                  <button
-                    onClick={() => setMsgs([])}
-                    title="Nova conversa"
-                    className="rounded-md px-2 py-1 text-xs text-[var(--muted)] hover:bg-[var(--line-soft)]"
-                  >
-                    limpar
-                  </button>
-                )}
-                <button
-                  onClick={() => setOpen(false)}
-                  aria-label="Fechar"
-                  className="grid h-7 w-7 place-items-center rounded-md text-[var(--muted)] hover:bg-[var(--line-soft)]"
-                >
-                  ✕
-                </button>
-              </div>
+      {/* painel lateral direito (CSS transform) */}
+      <aside
+        aria-hidden={!open}
+        className={
+          "fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-[var(--line)] bg-white shadow-[-8px_0_30px_-12px_rgba(16,24,40,0.25)] transition-transform duration-300 ease-out will-change-transform sm:w-[420px] " +
+          (open ? "translate-x-0" : "pointer-events-none translate-x-full")
+        }
+      >
+        <div className="flex items-center gap-3 border-b border-[var(--line)] px-4 py-3">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--brand-soft)] text-[var(--brand)]">✦</span>
+          <div className="min-w-0">
+            <div className="text-sm font-semibold">Relue</div>
+            <div className="truncate text-xs text-[var(--muted)]">
+              {busy ? "analisando a base…" : "inteligência de licitações de TI"}
             </div>
-
-            <div className="flex-1 space-y-3 overflow-y-auto bg-[var(--bg)] px-4 py-4">
-              {msgs.length === 0 && (
-                <div className="space-y-3">
-                  <p className="text-sm text-[var(--ink-soft)]">
-                    Pergunte qualquer coisa sobre as licitações de TI do PNCP.
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    {EXAMPLES.map((e) => (
-                      <button
-                        key={e}
-                        onClick={() => send(e)}
-                        className="card px-3 py-2 text-left text-xs text-[var(--ink-soft)] hover:border-[var(--brand)]"
-                      >
-                        {e}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {msgs.map((m, i) => (
-                <div key={i} className={m.role === "user" ? "text-right" : ""}>
-                  <div
-                    className={
-                      "inline-block max-w-full rounded-xl px-3.5 py-2 text-sm " +
-                      (m.role === "user"
-                        ? "bg-[var(--brand)] text-white"
-                        : "border border-[var(--line)] bg-white text-[var(--ink)]")
-                    }
-                  >
-                    {m.role === "assistant" ? (
-                      m.content ? (
-                        <div className="md">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
-                        </div>
-                      ) : (
-                        <span className="text-[var(--muted)]">analisando…</span>
-                      )
-                    ) : (
-                      m.content
-                    )}
-                    {m.sql && (
-                      <details className="mt-2 text-[11px] text-[var(--muted)]">
-                        <summary className="cursor-pointer">ver SQL</summary>
-                        <pre className="mt-1 whitespace-pre-wrap">{m.sql}</pre>
-                      </details>
-                    )}
-                  </div>
-                </div>
-              ))}
-              <div ref={endRef} />
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                send(input);
-              }}
-              className="flex gap-2 border-t border-[var(--line)] bg-white p-3"
-            >
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Pergunte ao Relue…"
-                className="flex-1 rounded-lg border border-[var(--line)] bg-white px-3 py-2 text-sm outline-none focus:border-[var(--brand)]"
-              />
+          </div>
+          <div className="ml-auto flex items-center gap-1">
+            {msgs.length > 0 && (
               <button
-                disabled={busy}
-                className="rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                onClick={() => setMsgs([])}
+                title="Nova conversa"
+                className="rounded-md px-2 py-1 text-xs text-[var(--muted)] hover:bg-[var(--line-soft)]"
               >
-                Enviar
+                limpar
               </button>
-            </form>
-          </motion.aside>
-        )}
-      </AnimatePresence>
+            )}
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Fechar"
+              className="grid h-7 w-7 place-items-center rounded-md text-[var(--muted)] hover:bg-[var(--line-soft)]"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1 space-y-3 overflow-y-auto bg-[var(--bg)] px-4 py-4">
+          {msgs.length === 0 && (
+            <div className="space-y-3">
+              <p className="text-sm text-[var(--ink-soft)]">
+                Pergunte qualquer coisa sobre as licitações de TI do PNCP.
+              </p>
+              <div className="flex flex-col gap-2">
+                {EXAMPLES.map((e) => (
+                  <button
+                    key={e}
+                    onClick={() => send(e)}
+                    className="card px-3 py-2 text-left text-xs text-[var(--ink-soft)] hover:border-[var(--brand)]"
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {msgs.map((m, i) => (
+            <div key={i} className={m.role === "user" ? "text-right" : ""}>
+              <div
+                className={
+                  "inline-block max-w-full rounded-xl px-3.5 py-2 text-sm " +
+                  (m.role === "user"
+                    ? "bg-[var(--brand)] text-white"
+                    : "border border-[var(--line)] bg-white text-[var(--ink)]")
+                }
+              >
+                {m.role === "assistant" ? (
+                  m.content ? (
+                    <div className="md">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <span className="text-[var(--muted)]">analisando…</span>
+                  )
+                ) : (
+                  m.content
+                )}
+                {m.sql && (
+                  <details className="mt-2 text-[11px] text-[var(--muted)]">
+                    <summary className="cursor-pointer">ver SQL</summary>
+                    <pre className="mt-1 whitespace-pre-wrap">{m.sql}</pre>
+                  </details>
+                )}
+              </div>
+            </div>
+          ))}
+          <div ref={endRef} />
+        </div>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            send(input);
+          }}
+          className="flex gap-2 border-t border-[var(--line)] bg-white p-3"
+        >
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Pergunte ao Relue…"
+            className="flex-1 rounded-lg border border-[var(--line)] bg-white px-3 py-2 text-sm outline-none focus:border-[var(--brand)]"
+          />
+          <button
+            disabled={busy}
+            className="rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            Enviar
+          </button>
+        </form>
+      </aside>
     </>
   );
 }
