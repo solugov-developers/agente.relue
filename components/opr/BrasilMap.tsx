@@ -28,7 +28,7 @@ export default function BrasilMap({ counts }: { counts: Record<string, number> }
     return { paths: ps, max: mx };
   }, [geo, counts]);
 
-  const color = scaleSqrt<string, string>().domain([0, max]).range(["#10162b", "#5b8cff"]);
+  const color = scaleSqrt<string, string>().domain([0, max]).range(["#eaf0ff", "#2f5bea"]);
 
   return (
     <div className="relative">
@@ -39,8 +39,8 @@ export default function BrasilMap({ counts }: { counts: Record<string, number> }
             key={p.uf}
             d={p.d}
             fill={color(p.n)}
-            stroke="rgba(255,255,255,0.14)"
-            strokeWidth={0.5}
+            stroke="#d8dce4"
+            strokeWidth={0.6}
             onMouseEnter={() => setHover({ uf: p.uf, n: p.n })}
             onMouseLeave={() => setHover(null)}
             className="cursor-default transition-opacity duration-150 hover:opacity-80"
@@ -48,7 +48,7 @@ export default function BrasilMap({ counts }: { counts: Record<string, number> }
         ))}
       </svg>
       {hover && (
-        <div className="glass absolute right-2 top-2 px-3 py-1.5 text-xs">
+        <div className="card absolute right-2 top-2 px-3 py-1.5 text-xs">
           <b>{hover.uf}</b> · {hover.n.toLocaleString("pt-BR")} licitações
         </div>
       )}

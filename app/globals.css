@@ -1,25 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #070709;
-  --bg-soft: #0c0d12;
-  --fg: #e7e9f3;
-  --muted: #8a8fa3;
-  --line: rgba(255, 255, 255, 0.08);
-  --blue: #5b8cff;
-  --violet: #9d6bff;
-  --cyan: #43e7ff;
-  --amber: #ff8a3d;
-  --amber-soft: #ffb37a;
+  --bg: #f5f6f8;
+  --panel: #ffffff;
+  --ink: #14161d;
+  --ink-soft: #3b4150;
+  --muted: #707788;
+  --line: #e7e9ee;
+  --line-soft: #eef0f3;
+  --brand: #2f5bea;
+  --brand-soft: #eaf0ff;
+  --pos: #16a34a;
+  --warn: #d9870b;
+  --neg: #dc2626;
+  --topbar: #14161f;
 }
 
 @theme inline {
   --color-bg: var(--bg);
-  --color-fg: var(--fg);
+  --color-panel: var(--panel);
+  --color-ink: var(--ink);
   --color-muted: var(--muted);
-  --color-blue: var(--blue);
-  --color-violet: var(--violet);
-  --color-amber: var(--amber);
+  --color-brand: var(--brand);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -27,75 +29,47 @@
 html,
 body {
   background: var(--bg);
-  color: var(--fg);
+  color: var(--ink);
 }
-
-/* fundo cockpit: gradientes radiais + grid sutil */
 body {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
-  background-image:
-    radial-gradient(900px 600px at 80% -10%, rgba(91, 140, 255, 0.12), transparent 60%),
-    radial-gradient(700px 500px at 0% 0%, rgba(157, 107, 255, 0.10), transparent 55%),
-    radial-gradient(1000px 700px at 50% 120%, rgba(255, 138, 61, 0.06), transparent 60%);
-  background-attachment: fixed;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: radial-gradient(circle at 50% 30%, black, transparent 85%);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* utilitários */
-.glass {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+.card {
+  background: var(--panel);
   border: 1px solid var(--line);
-  backdrop-filter: blur(14px);
-  border-radius: 18px;
-}
-.glass:hover {
-  border-color: rgba(91, 140, 255, 0.35);
-}
-.glow-blue {
-  box-shadow: 0 0 0 1px rgba(91, 140, 255, 0.25), 0 0 40px -10px rgba(91, 140, 255, 0.5);
-}
-.glow-amber {
-  box-shadow: 0 0 0 1px rgba(255, 138, 61, 0.3), 0 0 40px -10px rgba(255, 138, 61, 0.55);
-}
-.text-grad {
-  background: linear-gradient(90deg, var(--blue), var(--violet));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 }
 .num {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+}
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
 }
 
-@keyframes pulse-soft {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-.animate-pulse-soft { animation: pulse-soft 2.4s ease-in-out infinite; }
-
-/* scrollbar */
-::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 99px; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #d4d7de; border-radius: 99px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* tabelas do markdown no chat */
-.md table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }
-.md th { text-align: left; padding: 5px 8px; background: rgba(91, 140, 255, 0.12); border: 1px solid var(--line); }
-.md td { padding: 5px 8px; border: 1px solid var(--line); }
-.md a { color: var(--cyan); text-decoration: underline; }
+/* markdown do chat */
+.md table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
+.md th { text-align: left; padding: 6px 9px; background: #f3f5f9; border: 1px solid var(--line); color: var(--ink-soft); font-weight: 600; }
+.md td { padding: 6px 9px; border: 1px solid var(--line); }
+.md a { color: var(--brand); text-decoration: underline; }
 .md p { margin: 6px 0; }
-.md h3 { font-weight: 600; margin: 8px 0 4px; }
-.md strong { color: #fff; }
+.md h3 { font-weight: 600; margin: 10px 0 4px; }
+.md strong { color: var(--ink); font-weight: 600; }
+.md ul { list-style: disc; padding-left: 18px; margin: 6px 0; }
