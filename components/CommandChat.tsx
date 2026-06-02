@@ -113,7 +113,7 @@ export default function CommandChat() {
       <AnimatePresence>
         {open && (
           <motion.aside
-            className="fixed right-0 top-0 z-50 flex h-screen w-full max-w-[420px] flex-col border-l border-[var(--line)] bg-white shadow-[-8px_0_30px_-12px_rgba(16,24,40,0.25)]"
+            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-[var(--line)] bg-white shadow-[-8px_0_30px_-12px_rgba(16,24,40,0.25)] sm:w-[420px]"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
