@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -20,6 +21,7 @@ export default function CommandChat() {
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -53,6 +55,7 @@ export default function CommandChat() {
   async function send(question: string) {
     const text = question.trim();
     if (!text || busy) return;
+    const history = msgs.filter((m) => m.content); // trocas anteriores (memória de conversa)
     setInput("");
     setMsgs((m) => [...m, { role: "user", content: text }, { role: "assistant", content: "" }]);
     setBusy(true);
@@ -60,7 +63,7 @@ export default function CommandChat() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: text }),
+        body: JSON.stringify({ question: text, history }),
       });
       const reader = res.body!.getReader();
       const dec = new TextDecoder();
@@ -97,21 +100,12 @@ export default function CommandChat() {
     }
   }
 
+  // na tela dedicada da IA o chat já é a página inteira; no login não monta
+  if (pathname === "/relue" || pathname === "/login") return null;
+
   return (
     <>
-      {/* botão flutuante */}
-      <button
-        onClick={() => setOpen(true)}
-        aria-label="Abrir Relue"
-        className={
-          "fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-[var(--brand)] px-4 py-3 text-sm font-medium text-white shadow-lg shadow-blue-600/25 transition hover:brightness-110 " +
-          (open ? "pointer-events-none opacity-0" : "opacity-100")
-        }
-      >
-        <span>✦</span> Relue
-      </button>
-
-      {/* painel lateral direito (CSS transform) */}
+      {/* painel lateral direito (CSS transform) — abre pelo dock "Relue IA" ou ⌘K */}
       <aside
         aria-hidden={!open}
         className={

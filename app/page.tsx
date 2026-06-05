@@ -1,11 +1,26 @@
 import { getOpr } from "@/lib/opr";
-import TopBar, { type Kpi } from "@/components/TopBar";
+import PageHeader from "@/components/PageHeader";
 import Reveal from "@/components/opr/Reveal";
 import Bars from "@/components/opr/Bars";
+import ValueBars from "@/components/opr/ValueBars";
 import Sparkline from "@/components/opr/Sparkline";
 import ComboChart from "@/components/opr/ComboChart";
 import Donut from "@/components/opr/Donut";
 import BrasilMap from "@/components/opr/BrasilMap";
+
+const ESFERA: Record<string, string> = {
+  M: "Municipal",
+  E: "Estadual",
+  F: "Federal",
+  D: "Distrital",
+  N: "Outros",
+};
+const FAIXA_LABEL: Record<number, string> = {
+  1: "até R$ 50 mil",
+  2: "R$ 50 – 200 mil",
+  3: "R$ 200 mil – 1 mi",
+  4: "acima de R$ 1 mi",
+};
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +40,7 @@ export default async function OPR() {
   const k = d.kpi ?? {};
   const total = n(k.total) || 1;
 
-  const kpis: Kpi[] = [
+  const kpis: { label: string; value: string; sub?: string; accent?: boolean }[] = [
     { label: "Licitações de TI", value: int(k.total), sub: "12 meses" },
     { label: "Oportunidades abertas", value: int(k.abertas), sub: "prazo vigente", accent: true },
     { label: "Ticket mediano", value: brl(k.mediana_geral), sub: "global" },
@@ -54,16 +69,71 @@ export default async function OPR() {
   const tendencia = d.tendencia.map((t) => ({ mes: String(t.mes), n: n(t.n), valor: n(t.valor) }));
   const donut = d.modalidades.slice(0, 6).map((m) => ({ name: String(m.modalidade_nome), value: n(m.n) }));
   const marcas = d.marcas.map((r) => ({ label: String(r.marca ?? "—"), n: n(r.n) }));
-  const orgaos = d.orgaos.map((r) => ({ label: String(r.orgao_entidade ?? "—"), n: n(r.n) }));
   const ufCounts: Record<string, number> = {};
   d.ufs.forEach((r) => (ufCounts[String(r.uf)] = n(r.n)));
+
+  // novos boxes
+  const valorSeg = d.valorSeg.slice(0, 7).map((r) => ({
+    label: String(r.subcategoria ?? "—"),
+    value: n(r.v),
+    sub: `${int(r.n)} licitações`,
+  }));
+  const orgaosValor = d.orgaosValor.map((r) => ({
+    label: String(r.orgao_entidade ?? "—"),
+    value: n(r.v),
+    sub: `${int(r.n)} processos`,
+  }));
+  const j = d.janela ?? {};
+  const janela = [
+    { label: "Encerram em 7 dias", value: n(j.d7), tone: "warn" as const },
+    { label: "Encerram em 15 dias", value: n(j.d15), tone: "mid" as const },
+    { label: "Encerram em 30 dias", value: n(j.d30), tone: "ok" as const },
+  ];
+  const janelaMax = Math.max(1, n(j.abertas));
+  const faixasTotal = d.faixas.reduce((s, f) => s + n(f.n), 0) || 1;
+  const faixas = d.faixas.map((f) => ({
+    label: FAIXA_LABEL[Number(f.faixa)] ?? "—",
+    n: n(f.n),
+    pct: Math.round((n(f.n) / faixasTotal) * 100),
+  }));
+  const esferaTotal = d.esfera.reduce((s, e) => s + n(e.n), 0) || 1;
+  const esfera = d.esfera
+    .map((e) => ({ label: ESFERA[String(e.esfera_id)] ?? String(e.esfera_id), n: n(e.n), pct: Math.round((n(e.n) / esferaTotal) * 100) }))
+    .sort((a, b) => b.n - a.n);
 
   const updatedAt = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 
   return (
-    <>
-      <TopBar kpis={kpis} updatedAt={updatedAt} />
-      <main className="mx-auto max-w-[1440px] px-5 py-7">
+    <main className="mx-auto max-w-[1360px] px-5 py-8 md:px-8">
+      <PageHeader
+        kicker="Inteligência de Mercado"
+        title="Visão geral"
+        subtitle="Licitações públicas de TI — base PNCP · últimos 12 meses"
+        actions={
+          <span className="rounded-full bg-white px-3 py-1.5 text-xs text-[var(--muted)] ring-1 ring-[var(--line)]">
+            atualizado {updatedAt}
+          </span>
+        }
+      />
+
+      {/* KPIs */}
+      <div className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {kpis.map((k, i) => (
+          <Reveal key={k.label} delay={i * 0.03}>
+            <div className="card h-full p-4">
+              <div className="label">{k.label}</div>
+              <div
+                className={"num mt-1.5 text-[26px] font-bold leading-none " + (k.accent ? "text-gradient-primary" : "text-[var(--ink)]")}
+              >
+                {k.value}
+              </div>
+              {k.sub && <div className="mt-1.5 text-[11px] text-[var(--muted)]">{k.sub}</div>}
+            </div>
+          </Reveal>
+        ))}
+      </div>
+
+      <div>
         {/* Segmentos */}
         <SectionTitle title="Segmentos de TI" hint="distribuição, ticket mediano e tendência (12m)" />
         <div className="mb-9 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
@@ -105,67 +175,100 @@ export default async function OPR() {
           </Reveal>
         </div>
 
-        {/* Oportunidades + UF */}
+        {/* Onde está o dinheiro + UF */}
         <div className="mb-9 grid gap-4 lg:grid-cols-3">
           <Reveal className="lg:col-span-2">
-            <Panel title="Oportunidades quentes" hint="abertas, maior score — prioridade comercial">
-              <div className="overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="label border-b border-[var(--line)] text-left">
-                      <th className="py-2 font-medium">Score</th>
-                      <th className="py-2 font-medium">Objeto</th>
-                      <th className="py-2 text-right font-medium">Valor est.</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {d.oportunidades.length === 0 && (
-                      <tr>
-                        <td colSpan={3} className="py-6 text-center text-[var(--muted)]">
-                          Nenhuma com prazo aberto preenchido ainda.
-                        </td>
-                      </tr>
-                    )}
-                    {d.oportunidades.map((o) => (
-                      <tr key={String(o.pncp_id)} className="border-b border-[var(--line-soft)] align-top">
-                        <td className="py-2">
-                          <span className="num inline-grid h-7 w-9 place-items-center rounded-md bg-amber-50 text-xs font-bold text-amber-700">
-                            {int(o.score_oportunidade)}
-                          </span>
-                        </td>
-                        <td className="py-2 pr-3">
-                          <a href={String(o.link)} target="_blank" className="block max-w-[460px] truncate text-[var(--ink)] hover:text-[var(--brand)] hover:underline">
-                            {String(o.resumo ?? o.orgao_entidade)}
-                          </a>
-                          <span className="block truncate text-xs text-[var(--muted)]">
-                            {String(o.orgao_entidade)} · {String(o.uf)} · {String(o.subcategoria)}
-                          </span>
-                        </td>
-                        <td className="num py-2 text-right text-[var(--ink-soft)]">{brl(o.valor_total_estimado)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <Panel title="Onde está o dinheiro" hint="valor estimado em jogo por segmento">
+              <ValueBars rows={valorSeg} />
             </Panel>
           </Reveal>
           <Reveal delay={0.05}>
-            <Panel title="Distribuição por UF">
+            <Panel title="Distribuição geográfica" hint="licitações por UF">
               <BrasilMap counts={ufCounts} />
             </Panel>
           </Reveal>
         </div>
 
-        {/* Marcas + Órgãos */}
+        {/* Janela comercial + Faixas + Esfera */}
+        <div className="mb-9 grid gap-4 md:grid-cols-3">
+          <Reveal>
+            <Panel title="Janela comercial" hint="oportunidades abertas por prazo">
+              <div className="space-y-3.5 pt-1">
+                {janela.map((w) => (
+                  <div key={w.label}>
+                    <div className="mb-1 flex items-baseline justify-between">
+                      <span className="text-sm text-[var(--ink-soft)]">{w.label}</span>
+                      <span className="num text-lg font-bold text-[var(--ink)]">{int(w.value)}</span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--line-soft)]">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.min(100, (w.value / janelaMax) * 100)}%`,
+                          background: w.tone === "warn" ? "#d97706" : w.tone === "mid" ? "#a855f7" : "#7c3aed",
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <p className="pt-1 text-[11px] text-[var(--muted)]">
+                  prazos de envio de proposta a partir de hoje
+                </p>
+              </div>
+            </Panel>
+          </Reveal>
+
+          <Reveal delay={0.05}>
+            <Panel title="Faixas de valor" hint="estrutura do mercado">
+              <div className="space-y-3 pt-1">
+                {faixas.map((f) => (
+                  <div key={f.label}>
+                    <div className="mb-1 flex items-baseline justify-between text-sm">
+                      <span className="text-[var(--ink-soft)]">{f.label}</span>
+                      <span className="num text-[var(--muted)]">
+                        {int(f.n)} · {f.pct}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--line-soft)]">
+                      <div className="h-full rounded-full bg-[var(--brand)]" style={{ width: `${f.pct}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <Panel title="Esfera administrativa" hint="quem está comprando">
+              <div className="space-y-3 pt-1">
+                {esfera.map((e) => (
+                  <div key={e.label}>
+                    <div className="mb-1 flex items-baseline justify-between text-sm">
+                      <span className="text-[var(--ink-soft)]">{e.label}</span>
+                      <span className="num text-[var(--muted)]">
+                        {int(e.n)} · {e.pct}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--line-soft)]">
+                      <div className="h-full rounded-full bg-[var(--indigo)]" style={{ width: `${e.pct}%`, background: "var(--indigo)" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          </Reveal>
+        </div>
+
+        {/* Marcas + Contas-alvo por valor */}
         <div className="grid gap-4 lg:grid-cols-2">
           <Reveal>
-            <Panel title="Marcas mais demandadas" hint="padronizado (case/acento)">
+            <Panel title="Marcas mais demandadas" hint="fabricantes — padronizado (case/acento)">
               <Bars rows={marcas} />
             </Panel>
           </Reveal>
           <Reveal delay={0.05}>
-            <Panel title="Contas-alvo" hint="órgãos que mais compram TI">
-              <Bars rows={orgaos} accent="green" />
+            <Panel title="Contas-alvo por valor" hint="órgãos com maior volume financeiro">
+              <ValueBars rows={orgaosValor} accent="fuchsia" />
             </Panel>
           </Reveal>
         </div>
@@ -173,8 +276,8 @@ export default async function OPR() {
         <p className="mt-8 text-center text-xs text-[var(--muted)]">
           Relue · Solugov · base PNCP · cobertura de valor/prazo em enriquecimento contínuo
         </p>
-      </main>
-    </>
+      </div>
+    </main>
   );
 }
 

@@ -41,8 +41,8 @@ export default function ComboChart({ data }: { data: { mes: string; n: number; v
               : [Number(v).toLocaleString("pt-BR"), "Licitações"]
           }
         />
-        <Bar yAxisId="l" dataKey="n" name="Licitações" fill="#cdd8fb" radius={[4, 4, 0, 0]} barSize={16} />
-        <Line yAxisId="r" type="monotone" dataKey="valor" name="Valor (R$)" stroke="#2f5bea" strokeWidth={2} dot={false} />
+        <Bar yAxisId="l" dataKey="n" name="Licitações" fill="#ddd6fe" radius={[4, 4, 0, 0]} barSize={16} />
+        <Line yAxisId="r" type="monotone" dataKey="valor" name="Valor (R$)" stroke="#7c3aed" strokeWidth={2} dot={false} />
       </ComposedChart>
     </ResponsiveContainer>
   );

@@ -6,7 +6,7 @@ export type Bar = { label: string; n: number };
 
 export default function Bars({ rows, accent = "blue" }: { rows: Bar[]; accent?: "blue" | "amber" | "green" }) {
   const max = Math.max(1, ...rows.map((r) => r.n));
-  const fill = accent === "amber" ? "#d9870b" : accent === "green" ? "#16a34a" : "#2f5bea";
+  const fill = accent === "amber" ? "#a855f7" : accent === "green" ? "#6d28d9" : "#7c3aed";
   return (
     <div className="space-y-2.5">
       {rows.map((r, i) => (

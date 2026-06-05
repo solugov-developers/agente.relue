@@ -2,7 +2,7 @@
 
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
 
-export default function Sparkline({ data, color = "#2f5bea" }: { data: number[]; color?: string }) {
+export default function Sparkline({ data, color = "#7c3aed" }: { data: number[]; color?: string }) {
   const d = data.map((n, i) => ({ i, n }));
   const id = "sp" + color.replace("#", "");
   return (
