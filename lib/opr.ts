@@ -26,9 +26,9 @@ export async function getOpr() {
               count(*) filter (where data_encerramento_proposta >= now()) abertas,
               count(distinct orgao_entidade) orgaos,
               count(*) filter (where score_oportunidade >= 80) alto,
-              coalesce(sum(valor_total_estimado), 0) valor,
+              coalesce(sum(valor_total_estimado) filter (where valor_total_estimado < 999999999), 0) valor,
               percentile_cont(0.5) within group (order by valor_total_estimado)
-                filter (where valor_total_estimado is not null) mediana_geral
+                filter (where valor_total_estimado is not null and valor_total_estimado < 999999999) mediana_geral
        from public.licitacoes_ti where e_ti`
     ),
     safe(`select marca, count(*) n from public.v_marcas group by 1 order by 2 desc limit 12`),
@@ -43,7 +43,7 @@ export async function getOpr() {
     ),
     safe(
       `select to_char(date_trunc('month', data_publicacao_pncp), 'YYYY-MM') mes, count(*) n,
-              coalesce(sum(valor_total_estimado),0) valor
+              coalesce(sum(valor_total_estimado) filter (where valor_total_estimado < 999999999),0) valor
        from public.licitacoes_ti
        where e_ti and data_publicacao_pncp >= (now() - interval '12 months')
        group by 1 order by 1`
@@ -56,7 +56,7 @@ export async function getOpr() {
     ),
     // onde está o dinheiro — valor em jogo por segmento
     safe(
-      `select subcategoria, coalesce(sum(valor_total_estimado),0) v, count(*) n
+      `select subcategoria, coalesce(sum(valor_total_estimado) filter (where valor_total_estimado < 999999999),0) v, count(*) n
        from public.licitacoes_ti where e_ti group by 1 order by 2 desc nulls last`
     ),
     // janela comercial — prazos abrindo
@@ -80,7 +80,7 @@ export async function getOpr() {
     safe(`select esfera_id, count(*) n from public.licitacoes_ti where e_ti group by 1 order by 2 desc`),
     // contas-alvo por valor
     safe(
-      `select orgao_entidade, coalesce(sum(valor_total_estimado),0) v, count(*) n
+      `select orgao_entidade, coalesce(sum(valor_total_estimado) filter (where valor_total_estimado < 999999999),0) v, count(*) n
        from public.licitacoes_ti where e_ti group by 1 order by 2 desc nulls last limit 8`
     ),
   ]);

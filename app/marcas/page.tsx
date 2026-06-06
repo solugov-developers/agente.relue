@@ -39,18 +39,24 @@ export default async function Marcas({ searchParams }: { searchParams: SP }) {
   const search = pick("q");
   const view = pick("view") === "lista" ? "lista" : "cards";
   const marcas = await listMarcas(search);
+  const totalMarcas = marcas[0]?.total ? Number(marcas[0].total) : marcas.length;
 
   return (
     <main className="mx-auto max-w-[1360px] px-5 py-8 md:px-8">
       <PageHeader
         kicker="Channel · Fabricantes"
         title="Fabricantes & marcas"
-        subtitle="O que o governo compra por fabricante — abra uma marca para o panorama completo (material de pitch)."
+        subtitle={`${totalMarcas.toLocaleString("pt-BR")} fabricantes com 2+ licitações — abra uma marca para o panorama completo (material de pitch).`}
         actions={<ViewToggle />}
       />
       <div className="mb-5">
         <MarcaSearch initial={search ?? ""} />
       </div>
+      {marcas.length < totalMarcas && (
+        <p className="mb-3 text-xs text-[var(--muted)]">
+          mostrando os {marcas.length} maiores de {totalMarcas.toLocaleString("pt-BR")} — refine pela busca para achar um fabricante específico
+        </p>
+      )}
 
       {marcas.length === 0 ? (
         <div className="card p-14 text-center text-[var(--muted)]">Nenhuma marca encontrada.</div>

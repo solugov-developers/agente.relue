@@ -59,7 +59,7 @@ export const benchmarkList = unstable_cache(
               avg(i.valor_unitario_estimado) media
        from termos t
        left join public.licitacoes_itens i
-         on i.descricao ilike t.pat and i.valor_unitario_estimado > 0
+         on i.descricao ilike t.pat and i.valor_unitario_estimado > 0 and i.valor_unitario_estimado < 100000000
          and exists (select 1 from public.licitacoes_ti l where l.pncp_id = i.pncp_id and l.e_ti)
        group by t.label, t.q
        order by n desc`,
@@ -88,7 +88,7 @@ export async function searchPrecos(term?: string, sub?: string) {
               max(i.valor_unitario_estimado) maxv
        from public.licitacoes_itens i
        join public.licitacoes_ti l on l.pncp_id = i.pncp_id
-       where l.e_ti and i.descricao ilike $1 and i.valor_unitario_estimado > 0${subWhere}`,
+       where l.e_ti and i.descricao ilike $1 and i.valor_unitario_estimado > 0 and i.valor_unitario_estimado < 100000000${subWhere}`,
       p
     ),
     q<PrecoItem>(
@@ -96,7 +96,7 @@ export async function searchPrecos(term?: string, sub?: string) {
               l.orgao_entidade, l.uf, l.subcategoria, l.data_publicacao_pncp, l.link
        from public.licitacoes_itens i
        join public.licitacoes_ti l on l.pncp_id = i.pncp_id
-       where l.e_ti and i.descricao ilike $1 and i.valor_unitario_estimado > 0${subWhere}
+       where l.e_ti and i.descricao ilike $1 and i.valor_unitario_estimado > 0 and i.valor_unitario_estimado < 100000000${subWhere}
        order by l.data_publicacao_pncp desc nulls last
        limit 60`,
       p

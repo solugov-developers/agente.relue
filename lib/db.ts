@@ -14,9 +14,12 @@ const pool =
     password: process.env.PGPASSWORD,
     database: process.env.PGDATABASE,
     ssl: { rejectUnauthorized: false }, // pooler do Supabase usa cert self-signed
-    max: 4,
+    max: 3,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
   });
-if (process.env.NODE_ENV !== "production") global._pgPool = pool;
+// cacheia SEMPRE (inclusive em produção/serverless) p/ não estourar conexões no pooler
+global._pgPool = pool;
 
 export async function q<T = Record<string, unknown>>(
   sql: string,
