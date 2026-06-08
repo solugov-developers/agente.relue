@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Table2, Tags, DollarSign, Sparkles, LogOut, type LucideIcon } from "lucide-react";
+import { LayoutGrid, Table2, Tags, DollarSign, Sparkles, Activity, LogOut, type LucideIcon } from "lucide-react";
 
 const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/", label: "Visão geral", icon: LayoutGrid },
@@ -10,6 +10,7 @@ const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/marcas", label: "Fabricantes", icon: Tags },
   { href: "/precos", label: "Preços", icon: DollarSign },
   { href: "/relue", label: "Relue IA", icon: Sparkles },
+  { href: "/sync", label: "Sync", icon: Activity },
 ];
 
 export default function Sidebar() {
