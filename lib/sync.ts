@@ -36,7 +36,7 @@ export async function getSyncStatus() {
               count(distinct data_publicacao_pncp::date) dias_done,
               count(distinct data_publicacao_pncp::date) filter (where created_at >= now() - interval '60 min') dias_1h,
               count(*) filter (where created_at >= now() - interval '60 min') linhas_1h,
-              count(*) filter (where created_at >= now() - interval '5 min') linhas_5m
+              count(*) filter (where created_at >= now() - interval '25 min') linhas_rec
        from public.licitacoes_ti where fonte = 'backfill_v2'`
     ),
   ]);
@@ -47,7 +47,7 @@ export async function getSyncStatus() {
   const dias1h = Number(b.dias_1h ?? 0);
   const pct = Math.min(100, Math.round((diasDone / TARGET_DIAS) * 100));
   const etaHoras = dias1h > 0 ? Math.max(0, Math.round(((TARGET_DIAS - diasDone) / dias1h) * 10) / 10) : null;
-  const rodando = Number(b.linhas_5m ?? 0) > 0;
+  const rodando = Number(b.linhas_rec ?? 0) > 0;
 
   return {
     kpi: kpiArr[0] ?? {},
