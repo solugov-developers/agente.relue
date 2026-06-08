@@ -27,15 +27,17 @@ const FONTE_LABEL: Record<string, string> = {
 export default async function Sync() {
   const s = await getSyncStatus();
   const k = s.kpi as Record<string, unknown>;
-  const b = s.backfill as Record<string, unknown>;
+  const pp = s.pipe as Record<string, unknown>;
   const maxDia = Math.max(1, ...s.porDia.map((r) => n(r.n)));
   const maxCap = Math.max(1, ...s.captura.map((r) => n(r.eti)));
+  const etaMin = pp.etaMin == null ? null : n(pp.etaMin);
+  const etaTxt = etaMin == null ? "—" : etaMin < 60 ? `~${etaMin} min` : `~${(etaMin / 60).toFixed(1)} h`;
 
   const kpis = [
     { label: "Base total (TI)", value: int(k.ti), sub: `${int(k.total_all)} processos no banco` },
     { label: "Oportunidades abertas", value: int(k.abertas), sub: "prazo vigente", accent: true },
+    { label: "Em análise (IA)", value: int(k.pendentes), sub: "aguardando classificação" },
     { label: "Adicionadas hoje", value: int(k.hoje), sub: `${int(k.d7)} nos últimos 7 dias` },
-    { label: "Última gravação", value: ago(k.ultimo), sub: dt(k.ultimo) },
   ];
 
   return (
@@ -60,45 +62,47 @@ export default async function Sync() {
         ))}
       </div>
 
-      {/* Backfill progresso */}
-      <div className="card mb-6 p-5">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="font-semibold text-[var(--ink)]">Backfill histórico (12 meses)</h3>
-          <span
-            className={
-              "badge inline-flex items-center gap-1.5 " +
-              (b.rodando ? "bg-emerald-50 text-emerald-700" : "bg-amber-100 text-amber-700")
-            }
-          >
-            <span className={"h-1.5 w-1.5 rounded-full " + (b.rodando ? "animate-pulse bg-emerald-500" : "bg-amber-500")} />
-            {b.rodando ? "rodando" : "pausado"}
-          </span>
+      {/* Pipeline: 2 fases */}
+      <div className="mb-6 grid gap-4 lg:grid-cols-2">
+        {/* Fase 1 — Ingestão */}
+        <div className="card p-5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-semibold text-[var(--ink)]">1 · Ingestão (nuvem)</h3>
+            <span className={"badge inline-flex items-center gap-1.5 " + (pp.ingerindo ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500")}>
+              <span className={"h-1.5 w-1.5 rounded-full " + (pp.ingerindo ? "animate-pulse bg-emerald-500" : "bg-gray-400")} />
+              {pp.ingerindo ? "ingerindo" : "ocioso"}
+            </span>
+          </div>
+          <div className="mb-2 flex items-baseline justify-between text-sm">
+            <span className="text-[var(--ink-soft)]"><b className="num">{int(pp.diasCobertos)}</b> de {int(pp.target)} dias cobertos</span>
+            <span className="num font-bold text-[var(--brand)]">{int(pp.ingestPct)}%</span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-[var(--line-soft)]">
+            <div className="h-full rounded-full bg-[var(--brand)] transition-all duration-700" style={{ width: `${n(pp.ingestPct)}%` }} />
+          </div>
+          <p className="mt-3 text-[12px] text-[var(--muted)]">Busca todos os editais do PNCP (Edge Function paralela). Rápido — minutos.</p>
         </div>
-        <div className="mb-2 flex items-baseline justify-between text-sm">
-          <span className="text-[var(--ink-soft)]">
-            <b className="num">{int(b.diasDone)}</b> de {int(b.target)} dias cobertos
-          </span>
-          <span className="num font-bold text-[var(--brand)]">{int(b.pct)}%</span>
-        </div>
-        <div className="h-3 overflow-hidden rounded-full bg-[var(--line-soft)]">
-          <div className="h-full rounded-full bg-[var(--brand)] transition-all duration-700" style={{ width: `${n(b.pct)}%` }} />
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-1 text-[12px] text-[var(--muted)]">
-          <span>
-            Ritmo: <b className="num text-[var(--ink-soft)]">{int(b.dias1h)}</b> dias/h · {int(b.linhas_1h)} linhas/h
-          </span>
-          <span>
-            Tempo estimado:{" "}
-            <b className="num text-[var(--ink-soft)]">
-              {b.etaHoras == null ? (n(b.pct) >= 100 ? "concluído ✓" : "—") : `~${b.etaHoras}h`}
-            </b>
-          </span>
-          <span>
-            Cobre de <b className="num">{d(b.mn)}</b> a <b className="num">{d(b.mx)}</b>
-          </span>
-          <span>
-            <b className="num text-[var(--ink-soft)]">{int(b.eti)}</b> TI gravadas pelo backfill
-          </span>
+
+        {/* Fase 2 — Classificação */}
+        <div className="card p-5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-semibold text-[var(--ink)]">2 · Classificação (IA)</h3>
+            <span className={"badge inline-flex items-center gap-1.5 " + (pp.classificando ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500")}>
+              <span className={"h-1.5 w-1.5 rounded-full " + (pp.classificando ? "animate-pulse bg-emerald-500" : "bg-gray-400")} />
+              {pp.classificando ? "classificando" : "ocioso"}
+            </span>
+          </div>
+          <div className="mb-2 flex items-baseline justify-between text-sm">
+            <span className="text-[var(--ink-soft)]"><b className="num">{int(pp.pendentes)}</b> pendentes</span>
+            <span className="num font-bold text-[var(--brand)]">{int(pp.classifyPct)}%</span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-[var(--line-soft)]">
+            <div className="h-full rounded-full bg-[var(--brand)] transition-all duration-700" style={{ width: `${n(pp.classifyPct)}%` }} />
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px] text-[var(--muted)]">
+            <span>Ritmo: <b className="num text-[var(--ink-soft)]">{int(pp.taxaMin)}</b>/min</span>
+            <span>Tempo estimado: <b className="num text-[var(--ink-soft)]">{n(pp.pendentes) === 0 ? "concluído ✓" : etaTxt}</b></span>
+          </div>
         </div>
       </div>
 

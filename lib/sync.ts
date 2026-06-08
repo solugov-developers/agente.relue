@@ -3,10 +3,11 @@ import { q } from "./db";
 export async function getSyncStatus() {
   const safe = (sql: string) => (q(sql) as Promise<Record<string, unknown>[]>).catch(() => []);
 
-  const [kpiArr, porDia, fontes, captura, backfill] = await Promise.all([
+  const [kpiArr, porDia, fontes, captura, pipeArr] = await Promise.all([
     safe(
       `select count(*) total_all,
               count(*) filter (where e_ti) ti,
+              count(*) filter (where e_ti is null) pendentes,
               count(*) filter (where e_ti and data_encerramento_proposta >= now()) abertas,
               count(*) filter (where created_at >= date_trunc('day', now())) hoje,
               count(*) filter (where created_at >= now() - interval '7 days') d7,
@@ -21,6 +22,7 @@ export async function getSyncStatus() {
     ),
     safe(
       `select coalesce(fonte,'(sem fonte)') fonte, count(*) n, count(*) filter (where e_ti) eti,
+              count(*) filter (where e_ti is null) pend,
               min(data_publicacao_pncp)::date mn, max(data_publicacao_pncp)::date mx
        from public.licitacoes_ti group by 1 order by 2 desc`
     ),
@@ -31,29 +33,45 @@ export async function getSyncStatus() {
        group by 1 order by 1 desc`
     ),
     safe(
-      `select count(*) n, count(*) filter (where e_ti) eti,
-              min(data_publicacao_pncp)::date mn, max(data_publicacao_pncp)::date mx,
-              count(distinct data_publicacao_pncp::date) dias_done,
-              count(distinct data_publicacao_pncp::date) filter (where created_at >= now() - interval '60 min') dias_1h,
-              count(*) filter (where created_at >= now() - interval '60 min') linhas_1h,
-              count(*) filter (where created_at >= now() - interval '25 min') linhas_rec
-       from public.licitacoes_ti where fonte = 'backfill_v2'`
+      `select count(distinct data_publicacao_pncp::date) filter (where data_publicacao_pncp >= now() - interval '12 months') dias_cobertos,
+              count(*) filter (where e_ti is null) pendentes,
+              count(*) filter (where e_ti is not null) classificados,
+              count(*) filter (where classified_at >= now() - interval '10 min') class_10m,
+              count(*) filter (where created_at >= now() - interval '10 min') ing_10m
+       from public.licitacoes_ti`
     ),
   ]);
 
-  const TARGET_DIAS = 311; // escopo do backfill: 12 meses (newest-first), pulando domingos
-  const b = backfill[0] ?? {};
-  const diasDone = Number(b.dias_done ?? 0);
-  const dias1h = Number(b.dias_1h ?? 0);
-  const pct = Math.min(100, Math.round((diasDone / TARGET_DIAS) * 100));
-  const etaHoras = dias1h > 0 ? Math.max(0, Math.round(((TARGET_DIAS - diasDone) / dias1h) * 10) / 10) : null;
-  const rodando = Number(b.linhas_rec ?? 0) > 0;
+  const TARGET_DIAS = 314; // ~12 meses (newest-first, pulando domingos)
+  const p = pipeArr[0] ?? {};
+  const n = (v: unknown) => (v == null ? 0 : Number(v));
+  const diasCobertos = n(p.dias_cobertos);
+  const pendentes = n(p.pendentes);
+  const classificados = n(p.classificados);
+  const ingestPct = Math.min(100, Math.round((diasCobertos / TARGET_DIAS) * 100));
+  const totalCand = pendentes + classificados;
+  const classifyPct = totalCand > 0 ? Math.round((classificados / totalCand) * 100) : 0;
+  const taxaMin = n(p.class_10m) / 10; // classificados por minuto
+  const etaMin = taxaMin > 0 ? Math.round(pendentes / taxaMin) : null;
+  const ingerindo = n(p.ing_10m) > 0;
+  const classificando = n(p.class_10m) > 0;
 
   return {
     kpi: kpiArr[0] ?? {},
     porDia,
     fontes,
     captura,
-    backfill: { ...b, target: TARGET_DIAS, pct, etaHoras, rodando, diasDone, dias1h },
+    pipe: {
+      diasCobertos,
+      target: TARGET_DIAS,
+      ingestPct,
+      pendentes,
+      classificados,
+      classifyPct,
+      taxaMin: Math.round(taxaMin),
+      etaMin,
+      ingerindo,
+      classificando,
+    },
   };
 }
