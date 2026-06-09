@@ -105,24 +105,22 @@ export default async function Marcas({ searchParams }: { searchParams: SP }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {marcas.map((m, i) => (
-            <Reveal key={m.marca} delay={i * 0.02}>
-              <Link href={`/marcas?m=${encodeURIComponent(m.marca)}`} className="card group block h-full p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-[15px] font-semibold capitalize text-[var(--ink)] group-hover:text-[var(--brand)]">
-                    {m.marca}
-                  </span>
-                  {n(m.abertas) > 0 && (
-                    <span className="badge bg-emerald-50 text-emerald-700">{int(m.abertas)} abertas</span>
-                  )}
-                </div>
-                <div className="num mt-3 text-2xl font-bold text-[var(--ink)]">{compact(m.valor)}</div>
-                <div className="mt-1 flex items-center justify-between text-[12px] text-[var(--muted)]">
-                  <span>{int(m.n)} licitações</span>
-                  <span className="text-[var(--brand)] opacity-0 transition group-hover:opacity-100">ver →</span>
-                </div>
-              </Link>
-            </Reveal>
+          {marcas.map((m) => (
+            <Link key={m.marca} href={`/marcas?m=${encodeURIComponent(m.marca)}`} className="card group block h-full p-5">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-[15px] font-semibold capitalize text-[var(--ink)] group-hover:text-[var(--brand)]">
+                  {m.marca}
+                </span>
+                {n(m.abertas) > 0 && (
+                  <span className="badge bg-emerald-50 text-emerald-700">{int(m.abertas)} abertas</span>
+                )}
+              </div>
+              <div className="num mt-3 text-2xl font-bold text-[var(--ink)]">{compact(m.valor)}</div>
+              <div className="mt-1 flex items-center justify-between text-[12px] text-[var(--muted)]">
+                <span>{int(m.n)} licitações</span>
+                <span className="text-[var(--brand)] opacity-0 transition group-hover:opacity-100">ver →</span>
+              </div>
+            </Link>
           ))}
         </div>
       )}
