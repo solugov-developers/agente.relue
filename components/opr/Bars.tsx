@@ -1,19 +1,26 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export type Bar = { label: string; n: number };
 
-export default function Bars({ rows, accent = "blue" }: { rows: Bar[]; accent?: "blue" | "amber" | "green" }) {
+export default function Bars({ rows, accent = "blue", linkBase }: { rows: Bar[]; accent?: "blue" | "amber" | "green"; linkBase?: string }) {
   const max = Math.max(1, ...rows.map((r) => r.n));
   const fill = accent === "amber" ? "#a855f7" : accent === "green" ? "#6d28d9" : "#7c3aed";
   return (
     <div className="space-y-2.5">
       {rows.map((r, i) => (
         <div key={r.label} className="flex items-center gap-3 text-sm">
-          <span className="w-40 shrink-0 truncate text-[var(--ink-soft)]" title={r.label}>
-            {r.label}
-          </span>
+          {linkBase ? (
+            <Link href={linkBase + encodeURIComponent(r.label)} className="w-40 shrink-0 truncate text-[var(--ink-soft)] hover:text-[var(--brand)] hover:underline" title={r.label}>
+              {r.label}
+            </Link>
+          ) : (
+            <span className="w-40 shrink-0 truncate text-[var(--ink-soft)]" title={r.label}>
+              {r.label}
+            </span>
+          )}
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--line-soft)]">
             <motion.div
               initial={{ width: 0 }}

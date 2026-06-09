@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getOpr } from "@/lib/opr";
 import PageHeader from "@/components/PageHeader";
 import Reveal from "@/components/opr/Reveal";
@@ -40,13 +41,13 @@ export default async function OPR() {
   const k = d.kpi ?? {};
   const total = n(k.total) || 1;
 
-  const kpis: { label: string; value: string; sub?: string; accent?: boolean }[] = [
-    { label: "Licitações de TI", value: int(k.total), sub: "12 meses" },
-    { label: "Oportunidades abertas", value: int(k.abertas), sub: "prazo vigente", accent: true },
+  const kpis: { label: string; value: string; sub?: string; accent?: boolean; href?: string }[] = [
+    { label: "Licitações de TI", value: int(k.total), sub: "18 meses", href: "/licitacoes" },
+    { label: "Oportunidades abertas", value: int(k.abertas), sub: "ver as quentes →", accent: true, href: "/licitacoes?status=abertas&ordem=score" },
     { label: "Ticket mediano", value: brl(k.mediana_geral), sub: "global" },
-    { label: "Valor em jogo", value: compact(k.valor), sub: "estimado" },
+    { label: "Valor em jogo", value: compact(k.valor), sub: "maiores →", href: "/licitacoes?ordem=valor" },
     { label: "Órgãos", value: int(k.orgaos), sub: "compradores" },
-    { label: "Score alto", value: int(k.alto), sub: "80+" },
+    { label: "Score alto", value: int(k.alto), sub: "80+ →", href: "/licitacoes?ordem=score" },
   ];
 
   const months = d.tendencia.map((t) => String(t.mes));
@@ -108,7 +109,7 @@ export default async function OPR() {
       <PageHeader
         kicker="Inteligência de Mercado"
         title="Visão geral"
-        subtitle="Licitações públicas de TI — base PNCP · últimos 12 meses"
+        subtitle="Licitações públicas de TI — base PNCP · últimos 18 meses"
         actions={
           <span className="rounded-full bg-white px-3 py-1.5 text-xs text-[var(--muted)] ring-1 ring-[var(--line)]">
             atualizado {updatedAt}
@@ -118,19 +119,24 @@ export default async function OPR() {
 
       {/* KPIs */}
       <div className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        {kpis.map((k, i) => (
-          <Reveal key={k.label} delay={i * 0.03}>
-            <div className="card h-full p-4">
+        {kpis.map((k, i) => {
+          const inner = (
+            <div className={"card h-full p-4 " + (k.href ? "transition group-hover:border-[var(--brand)]/40" : "")}>
               <div className="label">{k.label}</div>
-              <div
-                className={"num mt-1.5 text-[26px] font-bold leading-none " + (k.accent ? "text-gradient-primary" : "text-[var(--ink)]")}
-              >
+              <div className={"num mt-1.5 text-[26px] font-bold leading-none " + (k.accent ? "text-gradient-primary" : "text-[var(--ink)]")}>
                 {k.value}
               </div>
-              {k.sub && <div className="mt-1.5 text-[11px] text-[var(--muted)]">{k.sub}</div>}
+              {k.sub && (
+                <div className={"mt-1.5 text-[11px] " + (k.href ? "text-[var(--brand)]" : "text-[var(--muted)]")}>{k.sub}</div>
+              )}
             </div>
-          </Reveal>
-        ))}
+          );
+          return (
+            <Reveal key={k.label} delay={i * 0.03}>
+              {k.href ? <Link href={k.href} className="group block h-full">{inner}</Link> : inner}
+            </Reveal>
+          );
+        })}
       </div>
 
       <div>
@@ -139,24 +145,26 @@ export default async function OPR() {
         <div className="mb-9 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
           {segmentos.map((s, i) => (
             <Reveal key={s.sub} delay={i * 0.04}>
-              <div className="card h-full p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-medium leading-tight text-[var(--ink)]">{s.sub}</span>
-                  <span className="badge bg-[var(--brand-soft)] text-[var(--brand)]">
-                    {Math.round((s.tot / total) * 100)}%
-                  </span>
+              <Link href={`/licitacoes?sub=${encodeURIComponent(s.sub)}`} className="group block h-full">
+                <div className="card h-full p-4 transition group-hover:border-[var(--brand)]/40">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-sm font-medium leading-tight text-[var(--ink)] group-hover:text-[var(--brand)]">{s.sub}</span>
+                    <span className="badge bg-[var(--brand-soft)] text-[var(--brand)]">
+                      {Math.round((s.tot / total) * 100)}%
+                    </span>
+                  </div>
+                  <div className="num mt-2 text-2xl font-bold">{int(s.tot)}</div>
+                  <div className="-mx-1 mt-1">
+                    <Sparkline data={s.spark} />
+                  </div>
+                  <div className="mt-2 flex items-center justify-between border-t border-[var(--line-soft)] pt-2 text-[11px] text-[var(--muted)]">
+                    <span>
+                      ticket <b className="num text-[var(--ink-soft)]">{compact(s.mediana)}</b>
+                    </span>
+                    <span className="num">n={int(s.nv)}</span>
+                  </div>
                 </div>
-                <div className="num mt-2 text-2xl font-bold">{int(s.tot)}</div>
-                <div className="-mx-1 mt-1">
-                  <Sparkline data={s.spark} />
-                </div>
-                <div className="mt-2 flex items-center justify-between border-t border-[var(--line-soft)] pt-2 text-[11px] text-[var(--muted)]">
-                  <span>
-                    ticket <b className="num text-[var(--ink-soft)]">{compact(s.mediana)}</b>
-                  </span>
-                  <span className="num">n={int(s.nv)}</span>
-                </div>
-              </div>
+              </Link>
             </Reveal>
           ))}
         </div>
@@ -179,7 +187,7 @@ export default async function OPR() {
         <div className="mb-9 grid gap-4 lg:grid-cols-3">
           <Reveal className="lg:col-span-2">
             <Panel title="Onde está o dinheiro" hint="valor estimado em jogo por segmento">
-              <ValueBars rows={valorSeg} />
+              <ValueBars rows={valorSeg} linkBase="/licitacoes?sub=" />
             </Panel>
           </Reveal>
           <Reveal delay={0.05}>
@@ -263,12 +271,12 @@ export default async function OPR() {
         <div className="grid gap-4 lg:grid-cols-2">
           <Reveal>
             <Panel title="Marcas mais demandadas" hint="fabricantes — padronizado (case/acento)">
-              <Bars rows={marcas} />
+              <Bars rows={marcas} linkBase="/marcas?m=" />
             </Panel>
           </Reveal>
           <Reveal delay={0.05}>
             <Panel title="Contas-alvo por valor" hint="órgãos com maior volume financeiro">
-              <ValueBars rows={orgaosValor} accent="fuchsia" />
+              <ValueBars rows={orgaosValor} accent="fuchsia" linkBase="/licitacoes?q=" />
             </Panel>
           </Reveal>
         </div>

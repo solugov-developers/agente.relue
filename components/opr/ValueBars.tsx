@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export type ValueRow = { label: string; value: number; sub?: string };
 
@@ -12,7 +13,7 @@ const compact = (x: number) => {
   return "R$ " + x.toLocaleString("pt-BR", { maximumFractionDigits: 0 });
 };
 
-export default function ValueBars({ rows, accent = "violet" }: { rows: ValueRow[]; accent?: "violet" | "fuchsia" }) {
+export default function ValueBars({ rows, accent = "violet", linkBase }: { rows: ValueRow[]; accent?: "violet" | "fuchsia"; linkBase?: string }) {
   const max = Math.max(1, ...rows.map((r) => r.value));
   const fill = accent === "fuchsia" ? "#c026d3" : "#7c3aed";
   return (
@@ -20,9 +21,15 @@ export default function ValueBars({ rows, accent = "violet" }: { rows: ValueRow[
       {rows.map((r, i) => (
         <div key={r.label} className="text-sm">
           <div className="mb-1 flex items-center justify-between gap-3">
-            <span className="truncate text-[var(--ink-soft)]" title={r.label}>
-              {r.label}
-            </span>
+            {linkBase ? (
+              <Link href={linkBase + encodeURIComponent(r.label)} className="truncate text-[var(--ink-soft)] hover:text-[var(--brand)] hover:underline" title={r.label}>
+                {r.label}
+              </Link>
+            ) : (
+              <span className="truncate text-[var(--ink-soft)]" title={r.label}>
+                {r.label}
+              </span>
+            )}
             <span className="num shrink-0 font-semibold text-[var(--ink)]">{compact(r.value)}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-[var(--line-soft)]">
