@@ -31,7 +31,7 @@ export async function getOpr() {
                 filter (where valor_total_estimado is not null and valor_total_estimado < 999999999) mediana_geral
        from public.licitacoes_ti where e_ti`
     ),
-    safe(`select marca, count(*) n from public.v_marcas group by 1 order by 2 desc limit 12`),
+    safe(`select marca, count(*) n from public.mv_marcas group by 1 order by 2 desc limit 12`),
     safe(
       `select subcategoria, count(*) total, count(valor_total_estimado) nv,
               percentile_cont(0.5) within group (order by valor_total_estimado) mediana
