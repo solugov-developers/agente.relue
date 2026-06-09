@@ -29,7 +29,7 @@ export async function listMarcas(search?: string): Promise<MarcaRow[]> {
      group by 1
      having count(distinct m.pncp_id) >= 2
      order by n desc
-     limit 200`,
+     limit 2000`,
     params
   );
 }
