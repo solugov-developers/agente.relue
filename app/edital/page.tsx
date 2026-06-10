@@ -73,8 +73,8 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
           </span>
         )}
       </div>
-      <h1 className="text-[24px] font-bold leading-tight tracking-tight text-[var(--ink)] md:text-[30px]">
-        {String(l.objeto_compra ?? l.resumo ?? "Edital")}
+      <h1 className="max-w-4xl text-[20px] font-bold leading-snug tracking-tight text-[var(--ink)] md:text-[24px]">
+        {String(l.resumo || (l.objeto_compra ? String(l.objeto_compra).slice(0, 120) + (String(l.objeto_compra).length > 120 ? "…" : "") : "Edital"))}
       </h1>
       <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-[var(--muted)]">
         <span className="font-medium text-[var(--ink-soft)]">{String(l.orgao_entidade ?? "—")}</span>
@@ -99,6 +99,16 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
           </div>
         ))}
       </div>
+
+      {/* Objeto completo */}
+      {l.objeto_compra ? (
+        <details className="card mb-4 p-5" open>
+          <summary className="label cursor-pointer list-none">Objeto da contratação</summary>
+          <p className="mt-2 whitespace-pre-line text-[14px] leading-relaxed text-[var(--ink-soft)]">
+            {String(l.objeto_compra)}
+          </p>
+        </details>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* itens */}
