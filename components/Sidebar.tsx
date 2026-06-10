@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { LayoutGrid, Table2, Tags, DollarSign, Sparkles, Activity, LogOut, type LucideIcon } from "lucide-react";
 
@@ -16,6 +17,18 @@ const NAV: { href: string; label: string; icon: LucideIcon }[] = [
 export default function Sidebar() {
   const path = usePathname();
   const isActive = (h: string) => (h === "/" ? path === "/" : path.startsWith(h));
+  const [user, setUser] = useState<{ nome: string; email: string } | null>(null);
+
+  useEffect(() => {
+    if (path === "/login") return;
+    fetch("/api/auth/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setUser({ nome: d.nome || "", email: d.email || "" }))
+      .catch(() => {});
+  }, [path]);
+
+  const initial = (user?.nome || user?.email || "?").trim().charAt(0).toUpperCase();
+  const primeiro = (user?.nome || "").split(" ")[0];
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -68,9 +81,17 @@ export default function Sidebar() {
 
         <div className="flex-1" />
 
+        {user && (
+          <div
+            title={`${user.nome || user.email}`}
+            className="mb-1 grid h-9 w-9 place-items-center rounded-full bg-[var(--brand)] text-sm font-semibold text-white"
+          >
+            {initial}
+          </div>
+        )}
         <button
           onClick={logout}
-          title="Sair"
+          title={user ? `Sair (${primeiro || user.email})` : "Sair"}
           aria-label="Sair"
           className="dock-floating grid h-11 w-11 place-items-center rounded-2xl text-[var(--muted)] hover:text-[var(--neg)]"
         >
@@ -98,9 +119,17 @@ export default function Sidebar() {
             </Link>
           );
         })}
-        <button onClick={logout} title="Sair" className="ml-auto rounded-lg px-2.5 py-1.5 text-[var(--ink-soft)] hover:text-[var(--neg)]">
-          <LogOut size={16} />
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          {user && (
+            <span className="hidden items-center gap-1.5 text-xs text-[var(--ink-soft)] sm:flex">
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-[var(--brand)] text-[11px] font-semibold text-white">{initial}</span>
+              {primeiro}
+            </span>
+          )}
+          <button onClick={logout} title="Sair" className="rounded-lg px-2.5 py-1.5 text-[var(--ink-soft)] hover:text-[var(--neg)]">
+            <LogOut size={16} />
+          </button>
+        </div>
       </div>
     </>
   );

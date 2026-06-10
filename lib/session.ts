@@ -19,15 +19,15 @@ async function hmacKey() {
   return crypto.subtle.importKey("raw", enc.encode(SECRET()) as BufferSource, { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
 }
 
-export async function signToken(email: string, days = 7): Promise<string> {
-  const payload = b64url(enc.encode(JSON.stringify({ e: email, x: Date.now() + days * 86400000 })));
+export async function signToken(email: string, nome = "", days = 7): Promise<string> {
+  const payload = b64url(enc.encode(JSON.stringify({ e: email, n: nome, x: Date.now() + days * 86400000 })));
   const sig = new Uint8Array(
     await crypto.subtle.sign("HMAC", await hmacKey(), enc.encode(payload) as BufferSource)
   );
   return payload + "." + b64url(sig);
 }
 
-export async function verifyToken(token: string | undefined): Promise<{ email: string } | null> {
+export async function verifyToken(token: string | undefined): Promise<{ email: string; nome: string } | null> {
   if (!token || !token.includes(".")) return null;
   const [payload, sig] = token.split(".");
   try {
@@ -40,7 +40,7 @@ export async function verifyToken(token: string | undefined): Promise<{ email: s
     if (!ok) return null;
     const data = JSON.parse(new TextDecoder().decode(fromB64url(payload)));
     if (!data?.x || data.x < Date.now()) return null;
-    return { email: data.e };
+    return { email: data.e, nome: data.n || "" };
   } catch {
     return null;
   }

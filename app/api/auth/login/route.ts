@@ -19,21 +19,23 @@ export async function POST(req: NextRequest) {
 
   let ok = false;
   let realEmail = email;
+  let nome = "";
   try {
-    const rows = await q<{ email: string; pass_hash: string }>(
-      "select email, pass_hash from public.app_users where lower(email) = lower($1)",
+    const rows = await q<{ email: string; pass_hash: string; nome: string | null }>(
+      "select email, pass_hash, nome from public.app_users where lower(email) = lower($1)",
       [email]
     );
     if (rows[0]) {
       ok = verifyPassword(password, rows[0].pass_hash);
       realEmail = rows[0].email;
+      nome = rows[0].nome || "";
     }
   } catch (e) {
     return NextResponse.json({ error: "Erro no servidor: " + (e as Error).message }, { status: 500 });
   }
   if (!ok) return NextResponse.json({ error: "E-mail ou senha incorretos." }, { status: 401 });
 
-  const token = await signToken(realEmail);
+  const token = await signToken(realEmail, nome);
   const res = NextResponse.json({ ok: true });
   res.cookies.set("relue_session", token, {
     httpOnly: true,
