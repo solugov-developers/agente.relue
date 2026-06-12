@@ -190,6 +190,7 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
               cnpj={String(l.cnpj_orgao ?? "")}
               ano={String(l.ano_compra ?? "")}
               seq={String(l.sequencial_compra ?? "")}
+              link={l.link ? String(l.link) : undefined}
             />
           </div>
         </div>

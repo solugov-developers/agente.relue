@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText } from "lucide-react";
+import { FileText, ExternalLink } from "lucide-react";
 
 type Arquivo = { titulo?: string; tipoDocumentoNome?: string; url?: string; uri?: string };
 
@@ -14,7 +14,17 @@ const cleanTitulo = (t?: string) => {
   }
 };
 
-export default function EditalArquivos({ cnpj, ano, seq }: { cnpj: string; ano: string; seq: string }) {
+export default function EditalArquivos({
+  cnpj,
+  ano,
+  seq,
+  link,
+}: {
+  cnpj: string;
+  ano: string;
+  seq: string;
+  link?: string;
+}) {
   const [arqs, setArqs] = useState<Arquivo[] | null>(null);
 
   useEffect(() => {
@@ -29,8 +39,24 @@ export default function EditalArquivos({ cnpj, ano, seq }: { cnpj: string; ano: 
   }, [cnpj, ano, seq]);
 
   if (arqs === null) return <p className="text-xs text-[var(--muted)]">carregando arquivos…</p>;
+
+  // PNCP bloqueia o IP do servidor -> link direto (abre do navegador do usuário)
   if (arqs.length === 0)
-    return <p className="text-xs text-[var(--muted)]">Nenhum arquivo disponível (ou PNCP indisponível agora).</p>;
+    return link ? (
+      <a
+        href={link}
+        target="_blank"
+        rel="noreferrer"
+        className="group flex items-center gap-2.5 rounded-xl bg-[var(--line-soft)] p-2.5 transition hover:bg-[var(--blue-soft)]"
+      >
+        <ExternalLink size={16} className="shrink-0 text-[var(--blue)]" />
+        <span className="text-[13px] font-medium text-[var(--ink-soft)] group-hover:text-[var(--blue)]">
+          Ver documentos no PNCP
+        </span>
+      </a>
+    ) : (
+      <p className="text-xs text-[var(--muted)]">Documentos disponíveis no portal do PNCP.</p>
+    );
 
   return (
     <ul className="space-y-1.5">
