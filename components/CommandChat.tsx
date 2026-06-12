@@ -107,12 +107,13 @@ export default function CommandChat() {
 
   return (
     <>
-      {/* painel lateral direito (CSS transform) — abre pelo dock "Relue IA" ou ⌘K */}
+      {/* painel lateral direito — abre via ⌘K / evento "relue-open".
+          Fechado = display:none (zero geometria → sem overflow/zoom no mobile). */}
       <aside
         aria-hidden={!open}
         className={
-          "glass-panel fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-white/10 shadow-[-16px_0_50px_-16px_rgba(2,2,8,0.7)] transition-transform duration-300 ease-out will-change-transform sm:w-[420px] " +
-          (open ? "translate-x-0" : "pointer-events-none translate-x-full")
+          "glass-panel fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-white/10 shadow-[-16px_0_50px_-16px_rgba(2,2,8,0.7)] sm:w-[420px] " +
+          (open ? "animate-fade-in" : "hidden")
         }
       >
         <div className="flex items-center gap-3 border-b border-[var(--line)] px-4 py-3">

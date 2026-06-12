@@ -51,6 +51,8 @@ html,
 body {
   background: var(--page);
   color: var(--ink);
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {

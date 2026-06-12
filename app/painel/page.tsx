@@ -169,7 +169,7 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
       </Reveal>
 
       {/* Crescimento + Janela + Modalidade */}
-      <div className="mb-7 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-7 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Reveal>
           <Panel title="Crescimento do mercado" hint="90 dias vs 90 anteriores">
             <div className="space-y-4 pt-1">
@@ -221,7 +221,7 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
       </div>
 
       {/* Onde está o dinheiro + Mapa */}
-      <div className="mb-7 grid gap-4 lg:grid-cols-3">
+      <div className="mb-7 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Reveal className="lg:col-span-2">
           <Panel title="Onde está o dinheiro" hint="valor estimado em jogo por segmento">
             <ValueBars rows={valorSeg} linkBase="/licitacoes?sub=" />
@@ -235,7 +235,7 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
       </div>
 
       {/* Segmentos compacto + Marcas */}
-      <div className="mb-7 grid gap-4 lg:grid-cols-2">
+      <div className="mb-7 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Reveal>
           <Panel title="Segmentos de TI" hint="participação · volume · ticket">
             <div className="space-y-2.5">
@@ -264,7 +264,7 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
       </div>
 
       {/* Contas-alvo por valor + Compradores mais ativos */}
-      <div className="mb-7 grid gap-4 lg:grid-cols-2">
+      <div className="mb-7 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Reveal>
           <Panel title="Contas-alvo por valor" hint="órgãos com maior volume financeiro">
             <ValueBars rows={orgaosValor} accent="fuchsia" linkBase="/licitacoes?q=" />
@@ -278,7 +278,7 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
       </div>
 
       {/* Perfil do mercado: faixas + esfera */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Reveal>
           <Panel title="Faixas de valor" hint="estrutura do mercado">
             <div className="space-y-3 pt-1">
