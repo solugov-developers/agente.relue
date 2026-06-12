@@ -3,6 +3,7 @@ import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
 import CommandChat from "@/components/CommandChat";
 import Sidebar from "@/components/Sidebar";
+import PWA from "@/components/PWA";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,11 +19,25 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   title: "Relue — Inteligência de Licitações de TI · Solugov",
   description: "Inteligência de mercado sobre licitações públicas de TI (base PNCP)",
+  applicationName: "Relue",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Relue" },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  formatDetection: { telephone: false },
 };
 
 export const viewport = {
   themeColor: "#09090c",
   colorScheme: "dark" as const,
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -31,9 +46,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-full p-0 lg:p-3">
         <div className="app-shell min-h-[100dvh] lg:min-h-[calc(100dvh-1.5rem)]">
           <Sidebar />
-          <div className="relative z-10 min-w-0 pb-24 lg:pb-0 lg:pl-[84px]">{children}</div>
+          <div className="pt-safe relative z-10 min-w-0 pb-24 lg:pb-0 lg:pl-[84px]">{children}</div>
         </div>
         <CommandChat />
+        <PWA />
       </body>
     </html>
   );

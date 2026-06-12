@@ -90,7 +90,10 @@ export default function Sidebar() {
       </aside>
 
       {/* dock inferior — mobile */}
-      <nav className="surface-frost fixed inset-x-3 bottom-3 z-40 flex items-center justify-around rounded-[26px] px-2 py-2 shadow-[0_12px_32px_-8px_hsl(240_50%_1%/0.7)] lg:hidden">
+      <nav
+        className="surface-frost fixed inset-x-3 z-40 flex items-center justify-around rounded-[26px] px-2 py-2 shadow-[0_12px_32px_-8px_hsl(240_50%_1%/0.7)] lg:hidden"
+        style={{ bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+      >
         {NAV.map((n) => {
           const active = isActive(n.href);
           const Icon = n.icon;

@@ -178,6 +178,16 @@ body {
   transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+/* safe-areas (PWA fullscreen / notch) */
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@media (min-width: 1024px) {
+  .pt-safe {
+    padding-top: 0;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;

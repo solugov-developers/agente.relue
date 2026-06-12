@@ -47,5 +47,6 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!login|api/auth|_next/static|_next/image|favicon.ico|br-states.json|relue-avatar.png).*)"],
+  // exclui login, api/auth, assets do Next e qualquer arquivo estático (com extensão)
+  matcher: ["/((?!login|api/auth|_next/static|_next/image|.*\\.[a-zA-Z0-9]+$).*)"],
 };
