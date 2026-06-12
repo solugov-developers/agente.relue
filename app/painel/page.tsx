@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { ArrowUpRight, TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import { getOpr } from "@/lib/opr";
-import { listLicitacoes } from "@/lib/licitacoes";
 import PageHeader from "@/components/PageHeader";
 import RangeTabs from "@/components/opr/RangeTabs";
 import Reveal from "@/components/opr/Reveal";
@@ -32,23 +31,26 @@ const compact = (v: unknown) => {
   if (x >= 1e3) return "R$ " + (x / 1e3).toFixed(0) + "k";
   return brl(x);
 };
-const fmtDays = (s: unknown) => {
-  if (!s) return null;
-  const d = Math.ceil((new Date(String(s)).getTime() - Date.now()) / 86400000);
-  return d < 0 ? null : d;
-};
+const pct = (cur: number, prev: number) => (prev > 0 ? Math.round(((cur - prev) / prev) * 100) : null);
 
 type SP = Promise<Record<string, string | string[] | undefined>>;
+
+function Delta({ d }: { d: number | null }) {
+  if (d == null) return null;
+  const up = d >= 0;
+  return (
+    <span className={"num inline-flex items-center gap-0.5 text-[11px] font-semibold " + (up ? "text-[var(--pos)]" : "text-[var(--neg)]")}>
+      {up ? <TrendingUp size={12} /> : <TrendingDown size={12} />} {Math.abs(d)}%
+    </span>
+  );
+}
 
 export default async function Painel({ searchParams }: { searchParams: SP }) {
   const sp = await searchParams;
   const rangeRaw = Array.isArray(sp.range) ? sp.range[0] : sp.range;
-  const months = [6, 12, 18].includes(Number(rangeRaw)) ? Number(rangeRaw) : 12;
+  const months = [3, 6, 12].includes(Number(rangeRaw)) ? Number(rangeRaw) : 12;
 
-  const [d, hot] = await Promise.all([
-    getOpr(months),
-    listLicitacoes({ status: "abertas", ordem: "score", pageSize: 6 }),
-  ]);
+  const d = await getOpr(months);
   const k = d.kpi ?? {};
   const total = n(k.total) || 1;
 
@@ -57,9 +59,7 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
   const sparkV = tendencia.map((t) => t.valor);
   const delta = (arr: number[]) => {
     if (arr.length < 2) return null;
-    const a = arr[arr.length - 1];
-    const b = arr[arr.length - 2];
-    return b > 0 ? Math.round(((a - b) / b) * 100) : null;
+    return pct(arr[arr.length - 1], arr[arr.length - 2]);
   };
   const dN = delta(sparkN);
   const dV = delta(sparkV);
@@ -72,8 +72,14 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
     { label: "Encerram em 30 dias", value: n(j.d30), tone: "ok" as const },
   ];
 
+  const cg = d.crescimento ?? {};
+  const cresc = [
+    { label: "Licitações publicadas", value: int(cg.cur_n), delta: pct(n(cg.cur_n), n(cg.prev_n)) },
+    { label: "Valor em jogo", value: compact(cg.cur_v), delta: pct(n(cg.cur_v), n(cg.prev_v)) },
+  ];
+
   const kpis = [
-    { label: "Licitações de TI", value: int(k.total), delta: dN, spark: sparkN as number[] | null, sub: `${months} meses`, accent: false, href: undefined as string | undefined },
+    { label: "Licitações de TI", value: int(k.total), delta: dN, spark: sparkN as number[] | null, sub: "base total", accent: false, href: undefined as string | undefined },
     { label: "Oportunidades abertas", value: int(k.abertas), delta: null, spark: null, sub: `${int(j.d7)} encerram em 7 dias`, accent: true, href: "/licitacoes?status=abertas&ordem=score" },
     { label: "Valor em jogo", value: compact(k.valor), delta: dV, spark: sparkV as number[] | null, sub: "estimado total", accent: false, href: "/licitacoes?ordem=valor" },
     { label: "Ticket mediano", value: brl(k.mediana_geral), delta: null, spark: null, sub: "global", accent: false, href: undefined },
@@ -81,8 +87,9 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
 
   const valorSeg = d.valorSeg.slice(0, 7).map((r) => ({ label: String(r.subcategoria ?? "—"), value: n(r.v), sub: `${int(r.n)} licitações` }));
   const orgaosValor = d.orgaosValor.map((r) => ({ label: String(r.orgao_entidade ?? "—"), value: n(r.v), sub: `${int(r.n)} processos` }));
+  const orgaosAtivos = d.orgaosAtivos.map((r) => ({ label: String(r.orgao_entidade ?? "—"), n: n(r.n) }));
   const marcas = d.marcas.map((r) => ({ label: String(r.marca ?? "—"), n: n(r.n) }));
-  const donut = d.modalidades.slice(0, 6).map((m) => ({ name: String(m.modalidade_nome), value: n(m.n) }));
+  const donut = d.modalidades.slice(0, 6).map((mo) => ({ name: String(mo.modalidade_nome), value: n(mo.n) }));
   const ufCounts: Record<string, number> = {};
   d.ufs.forEach((r) => (ufCounts[String(r.uf)] = n(r.n)));
 
@@ -125,11 +132,7 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
             <div className="card h-full p-5">
               <div className="flex items-start justify-between gap-2">
                 <div className="label">{kp.label}</div>
-                {kp.delta != null && (
-                  <span className={"num inline-flex items-center gap-0.5 text-[11px] font-semibold " + (kp.delta >= 0 ? "text-[var(--pos)]" : "text-[var(--neg)]")}>
-                    {kp.delta >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />} {Math.abs(kp.delta)}%
-                  </span>
-                )}
+                <Delta d={kp.delta} />
               </div>
               <div className={"num mt-2 text-[30px] font-bold leading-none " + (kp.accent ? "text-gradient-primary" : "glow-num text-[var(--ink)]")}>
                 {kp.value}
@@ -158,59 +161,37 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
         })}
       </div>
 
-      {/* Oportunidades quentes + Janela comercial */}
-      <div className="mb-7 grid gap-4 lg:grid-cols-3">
-        <Reveal className="lg:col-span-2">
-          <div className="card flex h-full flex-col overflow-hidden p-0">
-            <div className="flex items-center justify-between gap-2 border-b border-[var(--line)] px-5 py-3.5">
-              <div>
-                <h3 className="font-semibold text-[var(--ink)]">Oportunidades quentes</h3>
-                <p className="text-xs text-[var(--muted)]">abertas com maior score de oportunidade</p>
-              </div>
-              <Link href="/licitacoes?status=abertas&ordem=score" className="inline-flex items-center gap-1 text-xs font-medium text-[var(--blue)] hover:underline">
-                ver todas <ArrowUpRight size={13} />
-              </Link>
+      {/* Evolução do mercado (hero) */}
+      <Reveal className="mb-7 block">
+        <Panel title="Evolução do mercado" hint={`licitações (barras) e valor estimado (linha) · ${months} meses completos`}>
+          <ComboChart data={tendencia} />
+        </Panel>
+      </Reveal>
+
+      {/* Crescimento + Janela + Modalidade */}
+      <div className="mb-7 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Reveal>
+          <Panel title="Crescimento do mercado" hint="90 dias vs 90 anteriores">
+            <div className="space-y-4 pt-1">
+              {cresc.map((c) => (
+                <div key={c.label} className="flex items-end justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-sm text-[var(--ink-soft)]">{c.label}</div>
+                    <div className="num mt-0.5 text-2xl font-bold text-[var(--ink)]">{c.value}</div>
+                  </div>
+                  <div className="pb-1">
+                    <Delta d={c.delta} />
+                  </div>
+                </div>
+              ))}
+              <p className="pt-1 text-[11px] text-[var(--muted)]">volume publicado no trimestre vs o anterior</p>
             </div>
-            <div className="divide-y divide-[var(--line-soft)]">
-              {hot.rows.length === 0 ? (
-                <div className="p-8 text-center text-sm text-[var(--muted)]">Sem oportunidades abertas no momento.</div>
-              ) : (
-                hot.rows.map((r) => {
-                  const dias = fmtDays(r.data_encerramento_proposta);
-                  const score = r.score_oportunidade == null ? null : Number(r.score_oportunidade);
-                  return (
-                    <Link key={r.pncp_id} href={`/edital?id=${encodeURIComponent(r.pncp_id)}`} className="flex items-center gap-3 px-5 py-3 transition hover:bg-white/[0.03]">
-                      {score != null && (
-                        <span className="num grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--blue-soft)] text-[13px] font-bold text-[var(--blue)]">
-                          {score}
-                        </span>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-[13.5px] font-medium text-[var(--ink)]">{r.resumo || r.objeto_compra || "—"}</div>
-                        <div className="truncate text-[12px] text-[var(--muted)]">
-                          {r.orgao_entidade ?? "—"}
-                          {r.uf ? ` · ${r.uf}` : ""}
-                        </div>
-                      </div>
-                      <div className="shrink-0 text-right">
-                        <div className="num text-sm font-semibold text-[var(--ink)]">{compact(r.valor_total_estimado)}</div>
-                        {dias != null && (
-                          <div className={"num text-[11px] " + (dias <= 7 ? "text-[var(--warn)]" : "text-[var(--muted)]")}>
-                            {dias === 0 ? "encerra hoje" : `${dias}d restantes`}
-                          </div>
-                        )}
-                      </div>
-                    </Link>
-                  );
-                })
-              )}
-            </div>
-          </div>
+          </Panel>
         </Reveal>
 
         <Reveal delay={0.05}>
           <Panel title="Janela comercial" hint="prazos abrindo">
-            <div className="space-y-4 pt-1">
+            <div className="space-y-3.5 pt-1">
               {janela.map((w) => (
                 <div key={w.label}>
                   <div className="mb-1 flex items-baseline justify-between">
@@ -228,18 +209,16 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
                   </div>
                 </div>
               ))}
-              <p className="pt-1 text-[11px] text-[var(--muted)]">prazos de envio de proposta a partir de hoje</p>
             </div>
           </Panel>
         </Reveal>
-      </div>
 
-      {/* Evolução do mercado */}
-      <Reveal className="mb-7 block">
-        <Panel title="Evolução do mercado" hint={`licitações (barras) e valor estimado (linha) · ${months} meses`}>
-          <ComboChart data={tendencia} />
-        </Panel>
-      </Reveal>
+        <Reveal delay={0.1} className="md:col-span-2 lg:col-span-1">
+          <Panel title="Como o governo compra" hint="por modalidade">
+            <Donut data={donut} />
+          </Panel>
+        </Reveal>
+      </div>
 
       {/* Onde está o dinheiro + Mapa */}
       <div className="mb-7 grid gap-4 lg:grid-cols-3">
@@ -284,16 +263,16 @@ export default async function Painel({ searchParams }: { searchParams: SP }) {
         </Reveal>
       </div>
 
-      {/* Contas-alvo + Modalidade */}
-      <div className="mb-7 grid gap-4 lg:grid-cols-3">
-        <Reveal className="lg:col-span-2">
+      {/* Contas-alvo por valor + Compradores mais ativos */}
+      <div className="mb-7 grid gap-4 lg:grid-cols-2">
+        <Reveal>
           <Panel title="Contas-alvo por valor" hint="órgãos com maior volume financeiro">
             <ValueBars rows={orgaosValor} accent="fuchsia" linkBase="/licitacoes?q=" />
           </Panel>
         </Reveal>
         <Reveal delay={0.05}>
-          <Panel title="Como o governo compra" hint="por modalidade">
-            <Donut data={donut} />
+          <Panel title="Compradores mais ativos" hint="órgãos por nº de processos">
+            <Bars rows={orgaosAtivos} accent="amber" linkBase="/licitacoes?q=" />
           </Panel>
         </Reveal>
       </div>

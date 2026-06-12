@@ -3,9 +3,9 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const OPTS = [
+  { v: "3", l: "3 meses" },
   { v: "6", l: "6 meses" },
   { v: "12", l: "12 meses" },
-  { v: "18", l: "18 meses" },
 ];
 
 export default function RangeTabs() {
