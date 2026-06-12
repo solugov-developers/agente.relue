@@ -3,19 +3,23 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowUp, Sparkles } from "lucide-react";
+import { ArrowUp, Sparkles, Flame, Tags, DollarSign } from "lucide-react";
 import RelueOrb from "@/components/RelueOrb";
 
 type M = { role: "user" | "assistant"; content: string; sql?: string };
 
-const SUGGESTIONS: { label: string; q: string }[] = [
-  { label: "Top 10 marcas mais compradas", q: "Top 10 marcas de software mais compradas" },
-  { label: "Maiores oportunidades abertas (score 85+)", q: "Maiores oportunidades abertas com score acima de 85" },
-  { label: "Ticket mediano por segmento de TI", q: "Ticket mediano por segmento de TI" },
-  { label: "Evolução das licitações nos últimos 12 meses", q: "Evolução das licitações de TI nos últimos 12 meses" },
+const PILLS: { label: string; q: string }[] = [
+  { label: "Oportunidades", q: "Maiores oportunidades abertas com score acima de 85" },
+  { label: "Marcas", q: "Top 10 marcas de software mais compradas" },
+  { label: "Preços", q: "Preço mediano praticado para Microsoft 365" },
+  { label: "Tendências", q: "Evolução das licitações de TI nos últimos 12 meses" },
 ];
 
-const PILLS = ["Oportunidades", "Marcas", "Tendências", "Preços"];
+const CARDS: { icon: typeof Flame; title: string; desc: string; q: string }[] = [
+  { icon: Flame, title: "Oportunidades quentes", desc: "Abertas com maior score de oportunidade.", q: "Maiores oportunidades abertas com score acima de 85" },
+  { icon: Tags, title: "Top fabricantes", desc: "Marcas mais demandadas pelo governo.", q: "Top 10 marcas de software mais compradas" },
+  { icon: DollarSign, title: "Benchmark de preços", desc: "Preço praticado por produto/serviço.", q: "Ticket mediano por segmento de TI" },
+];
 
 export default function RelueChat() {
   const [msgs, setMsgs] = useState<M[]>([]);
@@ -86,84 +90,108 @@ export default function RelueChat() {
     }
   }
 
+  function pill(q: string) {
+    setInput(q);
+    inputRef.current?.focus();
+  }
+
   const empty = msgs.length === 0;
 
+  /* composer estilo LIX — strip superior + input + pills + send azul */
   const composer = (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         send(input);
       }}
-      className="surface-frost mx-auto flex w-full max-w-2xl items-end gap-2 rounded-[26px] p-2.5 shadow-[0_18px_50px_-16px_hsl(240_50%_2%/0.7)]"
+      className="surface-frost mx-auto w-full max-w-2xl rounded-[24px] p-2 shadow-[0_24px_60px_-20px_hsl(240_50%_1%/0.8)]"
     >
-      <textarea
-        ref={inputRef}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            send(input);
-          }
-        }}
-        rows={1}
-        placeholder="Pergunte ao Relue…"
-        className="max-h-40 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2.5 text-[15px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]"
-      />
-      <button
-        disabled={busy || !input.trim()}
-        aria-label="Enviar"
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-white transition hover:brightness-110 disabled:opacity-40"
-        style={{ background: "linear-gradient(135deg, hsl(217 91% 60%), hsl(262 83% 64%))" }}
-      >
-        <ArrowUp size={20} strokeWidth={2.4} />
-      </button>
+      <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-[var(--muted)]">
+        <Sparkles size={12} className="text-[var(--blue)]" />
+        Conectado à base PNCP · inteligência de licitações de TI
+      </div>
+      <div className="rounded-[18px] border border-[var(--line)] bg-black/30 p-2.5">
+        <textarea
+          ref={inputRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              send(input);
+            }
+          }}
+          rows={1}
+          placeholder="Pergunte qualquer coisa…"
+          className="max-h-40 min-h-[40px] w-full resize-none bg-transparent px-2 py-1.5 text-[15px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]"
+        />
+        <div className="mt-1 flex items-center gap-2">
+          <div className="flex flex-wrap gap-1.5">
+            {PILLS.map((p) => (
+              <button
+                key={p.label}
+                type="button"
+                onClick={() => pill(p.q)}
+                className="rounded-full border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--ink-soft)] transition hover:border-[var(--blue)]/50 hover:text-[var(--ink)]"
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <button
+            disabled={busy || !input.trim()}
+            aria-label="Enviar"
+            className="ml-auto grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--blue)] text-white shadow-[0_6px_18px_-4px_hsl(211_100%_50%/0.7)] transition hover:brightness-110 disabled:opacity-40"
+          >
+            <ArrowUp size={19} strokeWidth={2.4} />
+          </button>
+        </div>
+      </div>
     </form>
   );
 
   return (
-    <div className="ambient flex h-[100dvh] flex-col">
+    <div className="ambient">
       {empty ? (
-        /* estado vazio — hero estilo LIX */
-        <div className="flex flex-1 flex-col items-center justify-center px-5 pb-8">
-          <RelueOrb size={132} state={busy ? "thinking" : "idle"} />
-          <h1 className="mt-8 text-center text-[34px] font-bold leading-tight tracking-tight text-[var(--ink)] md:text-[44px]">
-            Olá{nome ? `, ${nome}` : ""} <span className="inline-block">👋</span>
-          </h1>
-          <p className="mt-2 mb-8 text-center text-[18px] text-[var(--muted)] md:text-[20px]">
+        /* estado inicial — hero estilo LIX */
+        <div className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col items-center justify-center px-5 py-10 lg:min-h-[calc(100dvh-1.5rem)]">
+          <RelueOrb size={124} state={busy ? "thinking" : "idle"} />
+          <h2 className="mt-9 text-center text-[26px] font-medium leading-tight tracking-tight text-[var(--muted)] md:text-[30px]">
+            Olá{nome ? `, ${nome}` : ""}
+          </h2>
+          <h1 className="mt-1 text-center text-[34px] font-bold leading-tight tracking-tight text-[var(--ink)] md:text-[46px]">
             Como posso ajudar hoje?
+          </h1>
+          <p className="mt-3 mb-9 max-w-md text-center text-[15px] leading-relaxed text-[var(--muted)]">
+            Sua inteligência de licitações de TI — pergunte sobre marcas, oportunidades, preços ou tendências.
           </p>
 
           <div className="w-full">{composer}</div>
 
-          <div className="mx-auto mt-3 flex max-w-2xl flex-wrap justify-center gap-2">
-            {PILLS.map((p) => (
-              <span key={p} className="rounded-full bg-white/[0.06] px-3.5 py-1.5 text-xs text-[var(--ink-soft)] ring-1 ring-[var(--line)]">
-                {p}
-              </span>
-            ))}
-          </div>
-
-          <div className="mx-auto mt-7 grid w-full max-w-2xl grid-cols-1 gap-2.5 sm:grid-cols-2">
-            {SUGGESTIONS.map((s) => (
-              <button
-                key={s.q}
-                onClick={() => send(s.q)}
-                className="card group flex items-center gap-3 p-4 text-left transition hover:-translate-y-0.5"
-              >
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[var(--blue-soft)] text-[var(--blue)]">
-                  <Sparkles size={15} />
-                </span>
-                <span className="text-[13.5px] text-[var(--ink-soft)] group-hover:text-[var(--ink)]">{s.label}</span>
-              </button>
-            ))}
+          <div className="mx-auto mt-4 grid w-full max-w-2xl grid-cols-1 gap-2.5 sm:grid-cols-3">
+            {CARDS.map((c) => {
+              const Icon = c.icon;
+              return (
+                <button
+                  key={c.title}
+                  onClick={() => send(c.q)}
+                  className="card group p-4 text-left transition hover:-translate-y-0.5"
+                >
+                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--blue-soft)] text-[var(--blue)]">
+                    <Icon size={16} />
+                  </span>
+                  <div className="mt-3 text-[13.5px] font-semibold text-[var(--ink)]">{c.title}</div>
+                  <div className="mt-0.5 text-[12px] leading-snug text-[var(--muted)]">{c.desc}</div>
+                </button>
+              );
+            })}
           </div>
         </div>
       ) : (
         /* conversa */
-        <>
-          <header className="surface-frost flex items-center gap-3 border-b px-6 py-3.5">
-            <RelueOrb size={36} state={busy ? "thinking" : "idle"} />
+        <div className="flex min-h-[100dvh] flex-col lg:min-h-[calc(100dvh-1.5rem)]">
+          <header className="flex items-center gap-3 px-6 py-4">
+            <RelueOrb size={34} state={busy ? "thinking" : "idle"} />
             <div className="min-w-0">
               <div className="text-sm font-semibold text-[var(--ink)]">Relue · Analista de Inteligência</div>
               <div className="text-xs text-[var(--muted)]">
@@ -172,25 +200,20 @@ export default function RelueChat() {
             </div>
             <button
               onClick={() => setMsgs([])}
-              className="ml-auto rounded-lg bg-white/[0.06] px-3 py-1.5 text-xs font-medium text-[var(--ink-soft)] ring-1 ring-[var(--line)] hover:bg-white/[0.1]"
+              className="ml-auto rounded-full border border-[var(--line)] px-3.5 py-1.5 text-xs font-medium text-[var(--ink-soft)] transition hover:border-[var(--blue)]/50 hover:text-[var(--ink)]"
             >
               Nova conversa
             </button>
           </header>
 
-          <div className="flex-1 overflow-y-auto px-4 py-6">
+          <div className="flex-1 overflow-y-auto px-4 py-4">
             <div className="mx-auto w-full max-w-3xl space-y-4">
               {msgs.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                   <div
                     className={
                       "max-w-[88%] rounded-2xl px-4 py-2.5 text-sm " +
-                      (m.role === "user" ? "text-white" : "card text-[var(--ink)]")
-                    }
-                    style={
-                      m.role === "user"
-                        ? { background: "linear-gradient(135deg, hsl(217 91% 58%), hsl(262 83% 62%))" }
-                        : undefined
+                      (m.role === "user" ? "bg-[var(--blue)] text-white" : "card text-[var(--ink)]")
                     }
                   >
                     {m.role === "assistant" ? (
@@ -217,8 +240,8 @@ export default function RelueChat() {
             </div>
           </div>
 
-          <div className="px-4 pb-5 pt-2">{composer}</div>
-        </>
+          <div className="px-4 pb-6 pt-2">{composer}</div>
+        </div>
       )}
     </div>
   );

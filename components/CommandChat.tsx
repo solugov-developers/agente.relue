@@ -101,8 +101,8 @@ export default function CommandChat() {
     }
   }
 
-  // na tela dedicada da IA o chat já é a página inteira; no login não monta
-  if (pathname === "/relue" || pathname === "/login") return null;
+  // na home (IA) e na tela dedicada o chat já é a página inteira; no login não monta
+  if (pathname === "/" || pathname === "/relue" || pathname === "/login") return null;
 
   return (
     <>
