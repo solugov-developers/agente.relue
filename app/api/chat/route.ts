@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
   if (!isReadOnly(sql))
     return streamResponse(
       { sql, rowCount: 0 },
-      "Só consigo responder com consultas de leitura. Reformule a pergunta. 🙂"
+      "Só consigo responder com consultas de leitura. Reformule a pergunta."
     );
 
   let rows: Record<string, unknown>[] = [];

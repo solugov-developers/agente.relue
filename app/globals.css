@@ -15,14 +15,14 @@
   --line: hsl(0 0% 100% / 0.08);
   --line-soft: hsl(0 0% 100% / 0.05);
 
-  /* acento azul (LIX) */
-  --brand: hsl(211 100% 56%);
-  --brand-strong: hsl(211 100% 48%);
-  --brand-soft: hsl(211 100% 56% / 0.14);
-  --blue: hsl(211 100% 56%);
-  --blue-soft: hsl(211 100% 56% / 0.14);
-  --accent: hsl(280 88% 66%);
-  --indigo: hsl(232 90% 68%);
+  /* acento teal #167591 */
+  --brand: hsl(194 74% 33%);
+  --brand-strong: hsl(194 82% 26%);
+  --brand-soft: hsl(194 74% 48% / 0.2);
+  --blue: hsl(194 74% 33%);
+  --blue-soft: hsl(194 74% 50% / 0.18);
+  --accent: hsl(184 70% 45%);
+  --indigo: hsl(205 72% 50%);
 
   --pos: hsl(152 58% 50%);
   --warn: hsl(38 92% 58%);
@@ -79,16 +79,16 @@ body {
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(70% 55% at 50% 118%, hsl(211 100% 52% / 0.5) 0%, transparent 60%),
-    radial-gradient(50% 40% at 50% -10%, hsl(220 60% 40% / 0.18) 0%, transparent 60%);
+    radial-gradient(110% 100% at 50% 106%, hsl(194 76% 40% / 0.62) 0%, hsl(194 74% 33% / 0.3) 35%, transparent 74%),
+    radial-gradient(60% 45% at 50% -8%, hsl(194 60% 32% / 0.18) 0%, transparent 60%);
   z-index: 0;
 }
 
 /* camada ambiente (glow azul de baixo) p/ telas full-bleed sem shell */
 .ambient {
   background-image:
-    radial-gradient(60% 50% at 50% 115%, hsl(211 100% 52% / 0.4) 0%, transparent 60%),
-    radial-gradient(50% 40% at 50% -8%, hsl(220 60% 40% / 0.15) 0%, transparent 60%);
+    radial-gradient(100% 88% at 50% 100%, hsl(194 85% 42% / 0.5) 0%, transparent 70%),
+    radial-gradient(55% 42% at 50% -6%, hsl(195 55% 35% / 0.14) 0%, transparent 60%);
 }
 
 /* ── Cards — clean, borda fina (estilo LIX) ─────────────────────── */
@@ -132,10 +132,10 @@ body {
 .dock-floating-active {
   background: var(--blue);
   color: #fff;
-  border: 1px solid hsl(211 100% 70% / 0.6);
+  border: 1px solid hsl(194 85% 60% / 0.6);
   box-shadow:
-    0 6px 18px -4px hsl(211 100% 50% / 0.6),
-    inset 0 1px 0 hsl(0 0% 100% / 0.35);
+    0 6px 18px -4px hsl(194 85% 40% / 0.65),
+    inset 0 1px 0 hsl(0 0% 100% / 0.3);
 }
 
 /* ── Tipografia / chips ──────────────────────────────────────────── */
@@ -145,7 +145,7 @@ body {
   letter-spacing: -0.015em;
 }
 .glow-num {
-  text-shadow: 0 0 22px hsl(211 100% 56% / 0.3);
+  text-shadow: 0 0 22px hsl(194 85% 48% / 0.32);
 }
 .font-display {
   font-family: var(--font-newsreader), Newsreader, ui-serif, Georgia, serif;
@@ -164,7 +164,7 @@ body {
   border-radius: 999px;
 }
 .text-gradient-primary {
-  background: linear-gradient(135deg, hsl(200 100% 66%) 0%, hsl(211 100% 60%) 50%, hsl(228 100% 72%) 100%);
+  background: linear-gradient(135deg, hsl(184 80% 56%) 0%, hsl(194 80% 48%) 50%, hsl(202 80% 54%) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -219,6 +219,22 @@ body {
     opacity: 1;
   }
 }
+@keyframes scan {
+  0% {
+    transform: translateY(-130%);
+  }
+  100% {
+    transform: translateY(360%);
+  }
+}
+@keyframes ring-pulse {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 
 /* markdown do chat */
 .md table {
@@ -230,7 +246,7 @@ body {
 .md th {
   text-align: left;
   padding: 6px 9px;
-  background: hsl(211 100% 56% / 0.12);
+  background: hsl(194 74% 45% / 0.14);
   border: 1px solid var(--line);
   color: var(--ink);
   font-weight: 600;

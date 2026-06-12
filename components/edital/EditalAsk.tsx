@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { MessageSquareText } from "lucide-react";
 
 const SUG = ["Resuma este edital", "O que está sendo comprado?", "Vale a pena? riscos e pontos de atenção"];
 
@@ -46,7 +47,9 @@ export default function EditalAsk({ pncpId }: { pncpId: string }) {
   return (
     <div className="card p-5">
       <div className="mb-3 flex items-center gap-2">
-        <span className="grid h-7 w-7 place-items-center rounded-lg bg-[var(--brand-soft)] text-[var(--brand)]">✦</span>
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-[var(--brand-soft)] text-[var(--blue)]">
+          <MessageSquareText size={14} />
+        </span>
         <h3 className="font-semibold text-[var(--ink)]">Pergunte ao Relue sobre este edital</h3>
       </div>
 

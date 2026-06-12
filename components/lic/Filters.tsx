@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Search } from "lucide-react";
 
 type Facets = {
   ufs: { uf: string; n: string }[];
@@ -48,7 +49,7 @@ export default function Filters({ facets }: { facets: Facets }) {
       <div className="flex flex-wrap items-center gap-2.5">
         {/* busca */}
         <div className="relative min-w-[240px] flex-1">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]">⌕</span>
+          <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
           <input
             value={qv}
             onChange={(e) => setQv(e.target.value)}

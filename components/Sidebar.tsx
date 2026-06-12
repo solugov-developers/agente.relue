@@ -82,7 +82,7 @@ export default function Sidebar() {
           <div
             title={`${user.nome || user.email}`}
             className="grid h-10 w-10 place-items-center rounded-full text-sm font-semibold text-white ring-2 ring-white/10"
-            style={{ background: "linear-gradient(135deg, hsl(211 100% 56%), hsl(232 90% 64%))" }}
+            style={{ background: "linear-gradient(135deg, hsl(194 74% 38%), hsl(202 70% 46%))" }}
           >
             {initial}
           </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 
 const SEGMENTOS = [
   "ERP/Gestão",
@@ -43,7 +44,7 @@ export default function PrecoSearch({ initial, sub = "" }: { initial: string; su
         className="flex flex-wrap gap-2"
       >
         <div className="relative min-w-[240px] flex-1">
-          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]">⌕</span>
+          <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
           <input
             value={v}
             onChange={(e) => setV(e.target.value)}

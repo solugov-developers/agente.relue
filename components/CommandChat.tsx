@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import RelueOrb from "@/components/RelueOrb";
+import { X } from "lucide-react";
+import RelueAvatar from "@/components/RelueAvatar";
 
 type M = { role: "user" | "assistant"; content: string; sql?: string };
 
@@ -115,7 +116,7 @@ export default function CommandChat() {
         }
       >
         <div className="flex items-center gap-3 border-b border-[var(--line)] px-4 py-3">
-          <RelueOrb size={30} state={busy ? "thinking" : "idle"} />
+          <RelueAvatar size={34} state={busy ? "thinking" : "idle"} />
           <div className="min-w-0">
             <div className="text-sm font-semibold">Relue</div>
             <div className="truncate text-xs text-[var(--muted)]">
@@ -137,7 +138,7 @@ export default function CommandChat() {
               aria-label="Fechar"
               className="grid h-7 w-7 place-items-center rounded-md text-[var(--muted)] hover:bg-[var(--line-soft)]"
             >
-              ✕
+              <X size={15} />
             </button>
           </div>
         </div>

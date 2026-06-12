@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 
 export default function MarcaSearch({ initial }: { initial: string }) {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function MarcaSearch({ initial }: { initial: string }) {
 
   return (
     <div className="relative max-w-md">
-      <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]">⌕</span>
+      <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
       <input
         value={v}
         onChange={(e) => setV(e.target.value)}

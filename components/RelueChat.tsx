@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowUp, Sparkles, Flame, Tags, DollarSign } from "lucide-react";
-import RelueOrb from "@/components/RelueOrb";
+import { ArrowUp, Target, Tags, DollarSign } from "lucide-react";
+import RelueAvatar from "@/components/RelueAvatar";
 
 type M = { role: "user" | "assistant"; content: string; sql?: string };
 
@@ -15,8 +15,8 @@ const PILLS: { label: string; q: string }[] = [
   { label: "Tendências", q: "Evolução das licitações de TI nos últimos 12 meses" },
 ];
 
-const CARDS: { icon: typeof Flame; title: string; desc: string; q: string }[] = [
-  { icon: Flame, title: "Oportunidades quentes", desc: "Abertas com maior score de oportunidade.", q: "Maiores oportunidades abertas com score acima de 85" },
+const CARDS: { icon: typeof Target; title: string; desc: string; q: string }[] = [
+  { icon: Target, title: "Oportunidades em aberto", desc: "Abertas com maior score de oportunidade.", q: "Maiores oportunidades abertas com score acima de 85" },
   { icon: Tags, title: "Top fabricantes", desc: "Marcas mais demandadas pelo governo.", q: "Top 10 marcas de software mais compradas" },
   { icon: DollarSign, title: "Benchmark de preços", desc: "Preço praticado por produto/serviço.", q: "Ticket mediano por segmento de TI" },
 ];
@@ -106,8 +106,8 @@ export default function RelueChat() {
       }}
       className="surface-frost mx-auto w-full max-w-2xl rounded-[24px] p-2 shadow-[0_24px_60px_-20px_hsl(240_50%_1%/0.8)]"
     >
-      <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-[var(--muted)]">
-        <Sparkles size={12} className="text-[var(--blue)]" />
+      <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-[var(--muted)]">
+        <span className="h-1.5 w-1.5 rounded-full bg-[var(--pos)]" />
         Conectado à base PNCP · inteligência de licitações de TI
       </div>
       <div className="rounded-[18px] border border-[var(--line)] bg-black/30 p-2.5">
@@ -155,7 +155,7 @@ export default function RelueChat() {
       {empty ? (
         /* estado inicial — hero estilo LIX */
         <div className="mx-auto flex min-h-[100dvh] max-w-3xl flex-col items-center justify-center px-5 py-10 lg:min-h-[calc(100dvh-1.5rem)]">
-          <RelueOrb size={124} state={busy ? "thinking" : "idle"} />
+          <RelueAvatar size={132} state={busy ? "thinking" : "idle"} />
           <h2 className="mt-9 text-center text-[26px] font-medium leading-tight tracking-tight text-[var(--muted)] md:text-[30px]">
             Olá{nome ? `, ${nome}` : ""}
           </h2>
@@ -191,7 +191,7 @@ export default function RelueChat() {
         /* conversa */
         <div className="flex min-h-[100dvh] flex-col lg:min-h-[calc(100dvh-1.5rem)]">
           <header className="flex items-center gap-3 px-6 py-4">
-            <RelueOrb size={34} state={busy ? "thinking" : "idle"} />
+            <RelueAvatar size={38} state={busy ? "thinking" : "idle"} />
             <div className="min-w-0">
               <div className="text-sm font-semibold text-[var(--ink)]">Relue · Analista de Inteligência</div>
               <div className="text-xs text-[var(--muted)]">

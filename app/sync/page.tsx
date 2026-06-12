@@ -101,7 +101,7 @@ export default async function Sync() {
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px] text-[var(--muted)]">
             <span>Ritmo: <b className="num text-[var(--ink-soft)]">{int(pp.taxaMin)}</b>/min</span>
-            <span>Tempo estimado: <b className="num text-[var(--ink-soft)]">{n(pp.pendentes) === 0 ? "concluído ✓" : etaTxt}</b></span>
+            <span>Tempo estimado: <b className="num text-[var(--ink-soft)]">{n(pp.pendentes) === 0 ? "concluído" : etaTxt}</b></span>
           </div>
         </div>
       </div>

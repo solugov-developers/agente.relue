@@ -18,7 +18,7 @@ export default function RelueOrb({
         className="absolute inset-0 rounded-full blur-2xl"
         style={{
           background:
-            "radial-gradient(circle at 50% 50%, hsl(214 100% 60% / 0.7), hsl(224 90% 56% / 0.4) 45%, transparent 70%)",
+            "radial-gradient(circle at 50% 50%, hsl(194 80% 50% / 0.7), hsl(198 70% 40% / 0.4) 45%, transparent 70%)",
           animation: `orb-pulse ${pulse} ease-in-out infinite`,
         }}
       />
@@ -27,16 +27,16 @@ export default function RelueOrb({
         className="absolute inset-0 overflow-hidden rounded-full"
         style={{
           boxShadow:
-            "inset 0 0 30px rgba(255,255,255,0.3), inset -8px -12px 28px rgba(8,16,50,0.6), 0 10px 38px -6px hsl(214 100% 52% / 0.6)",
+            "inset 0 0 30px rgba(255,255,255,0.3), inset -8px -12px 28px rgba(6,30,38,0.62), 0 10px 38px -6px hsl(194 80% 38% / 0.6)",
         }}
       >
-        {/* gradiente iridescente girando (azul dominante + raia quente — estilo LIX) */}
+        {/* gradiente iridescente girando (teal dominante + raia quente) */}
         <div
           className="absolute"
           style={{
             inset: "-30%",
             background:
-              "conic-gradient(from 210deg, #1d4ed8, #3b82f6, #93c5fd, #ffffff, #f87171, #7c2d12, #1e3a8a, #2563eb, #1d4ed8)",
+              "conic-gradient(from 210deg, #0e4f63, #167591, #2596b8, #7fd6e6, #ffffff, #f0a868, #9a4a20, #0c4254, #1a7d99, #0e4f63)",
             animation: `orb-spin ${spin} linear infinite`,
             filter: "blur(8px)",
           }}
