@@ -48,7 +48,7 @@ export default function PrecoSearch({ initial, sub = "" }: { initial: string; su
             value={v}
             onChange={(e) => setV(e.target.value)}
             placeholder="Descreva o produto/serviço (ex.: Zoom, antivírus, licença AutoCAD…)"
-            className="h-11 w-full rounded-full border border-[var(--line)] bg-white pl-10 pr-4 text-sm outline-none transition focus:border-[var(--brand)]"
+            className="h-11 w-full rounded-full border border-[var(--line)] bg-white/[0.06] pl-10 pr-4 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--brand)]"
           />
         </div>
         <select
@@ -57,7 +57,7 @@ export default function PrecoSearch({ initial, sub = "" }: { initial: string; su
             setSeg(e.target.value);
             if (v.trim()) go(v, e.target.value);
           }}
-          className="h-11 rounded-full border border-[var(--line)] bg-white px-3.5 text-sm text-[var(--ink-soft)] outline-none focus:border-[var(--brand)]"
+          className="h-11 rounded-full border border-[var(--line)] bg-white/[0.06] px-3.5 text-sm text-[var(--ink-soft)] outline-none focus:border-[var(--brand)] [&>option]:bg-[#15151c] [&>option]:text-[var(--ink)]"
           title="Filtrar por segmento (ajuda a separar, ex.: software de câmera)"
         >
           <option value="">Todos os segmentos</option>
@@ -79,7 +79,7 @@ export default function PrecoSearch({ initial, sub = "" }: { initial: string; su
               setV(s);
               go(s);
             }}
-            className="rounded-full bg-white px-3 py-1 text-xs text-[var(--ink-soft)] ring-1 ring-[var(--line)] transition hover:border-[var(--brand)] hover:text-[var(--brand)]"
+            className="rounded-full bg-white/[0.06] px-3 py-1 text-xs text-[var(--ink-soft)] ring-1 ring-[var(--line)] transition hover:bg-white/[0.1] hover:text-[var(--brand)]"
           >
             {s}
           </button>

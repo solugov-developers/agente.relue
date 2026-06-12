@@ -62,13 +62,13 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
 
       {/* header */}
       <div className="mb-2 flex flex-wrap items-center gap-2">
-        <span className={"badge inline-flex items-center gap-1.5 px-2.5 py-1 " + (aberta ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500")}>
-          <span className={"h-1.5 w-1.5 rounded-full " + (aberta ? "bg-emerald-500" : "bg-gray-400")} />
+        <span className={"badge inline-flex items-center gap-1.5 px-2.5 py-1 " + (aberta ? "bg-emerald-400/15 text-emerald-300" : "bg-white/[0.07] text-[var(--muted)]")}>
+          <span className={"h-1.5 w-1.5 rounded-full " + (aberta ? "bg-emerald-400" : "bg-white/30")} />
           {aberta ? "Aberta" : "Encerrada / sem prazo"}
         </span>
-        {l.subcategoria != null && <span className="badge bg-violet-50 text-violet-700">{String(l.subcategoria)}</span>}
+        {l.subcategoria != null && <span className="badge bg-violet-400/15 text-violet-300">{String(l.subcategoria)}</span>}
         {l.score_oportunidade != null && (
-          <span className="num badge bg-violet-100 text-violet-700" title="Score de oportunidade (0–100) da IA">
+          <span className="num badge bg-violet-400/20 text-violet-200" title="Score de oportunidade (0–100) da IA">
             score {String(l.score_oportunidade)}
           </span>
         )}
@@ -125,7 +125,7 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
             ) : (
               <div className="max-h-[560px] overflow-auto">
                 <table className="w-full text-sm">
-                  <thead className="sticky top-0 bg-white">
+                  <thead className="surface-frost sticky top-0">
                     <tr className="label border-b border-[var(--line)] text-left">
                       <th className="w-10 px-4 py-2.5 text-center font-medium">#</th>
                       <th className="px-3 py-2.5 font-medium">Descrição</th>
@@ -176,7 +176,7 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
                     <Link
                       key={m}
                       href={`/marcas?m=${encodeURIComponent(m)}`}
-                      className="badge bg-violet-50 capitalize text-violet-700 hover:bg-violet-100"
+                      className="badge bg-violet-400/15 capitalize text-violet-300 hover:bg-violet-400/25"
                     >
                       {m}
                     </Link>

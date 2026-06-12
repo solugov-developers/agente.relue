@@ -111,7 +111,7 @@ export default async function OPR() {
         title="Visão geral"
         subtitle="Licitações públicas de TI — base PNCP · últimos 18 meses"
         actions={
-          <span className="rounded-full bg-white px-3 py-1.5 text-xs text-[var(--muted)] ring-1 ring-[var(--line)]">
+          <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-[var(--muted)] ring-1 ring-[var(--line)]">
             atualizado {updatedAt}
           </span>
         }
@@ -123,7 +123,7 @@ export default async function OPR() {
           const inner = (
             <div className={"card h-full p-4 " + (k.href ? "transition group-hover:border-[var(--brand)]/40" : "")}>
               <div className="label">{k.label}</div>
-              <div className={"num mt-1.5 text-[26px] font-bold leading-none " + (k.accent ? "text-gradient-primary" : "text-[var(--ink)]")}>
+              <div className={"num mt-1.5 text-[26px] font-bold leading-none " + (k.accent ? "text-gradient-primary" : "glow-num text-[var(--ink)]")}>
                 {k.value}
               </div>
               {k.sub && (
@@ -213,7 +213,7 @@ export default async function OPR() {
                         className="h-full rounded-full"
                         style={{
                           width: `${Math.min(100, (w.value / janelaMax) * 100)}%`,
-                          background: w.tone === "warn" ? "#d97706" : w.tone === "mid" ? "#a855f7" : "#7c3aed",
+                          background: w.tone === "warn" ? "#f59e0b" : w.tone === "mid" ? "#a855f7" : "#3b82f6",
                         }}
                       />
                     </div>

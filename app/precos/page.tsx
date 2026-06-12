@@ -57,7 +57,7 @@ export default async function Precos({ searchParams }: { searchParams: SP }) {
                 </thead>
                 <tbody>
                   {bench.map((b) => (
-                    <tr key={b.label} className="border-b border-[var(--line-soft)] hover:bg-white/50">
+                    <tr key={b.label} className="border-b border-[var(--line-soft)] hover:bg-white/[0.04]">
                       <td className="px-4 py-3">
                         <Link href={`/precos?q=${encodeURIComponent(b.q)}`} className="font-medium text-[var(--ink)] hover:text-[var(--brand)]">
                           {b.label}
@@ -126,7 +126,7 @@ export default async function Precos({ searchParams }: { searchParams: SP }) {
                 </thead>
                 <tbody>
                   {rows.map((r, i) => (
-                    <tr key={i} className="border-b border-[var(--line-soft)] align-top hover:bg-white/50">
+                    <tr key={i} className="border-b border-[var(--line-soft)] align-top hover:bg-white/[0.04]">
                       <td className="max-w-[440px] px-4 py-3">
                         <a
                           href={r.link ?? undefined}
@@ -137,7 +137,7 @@ export default async function Precos({ searchParams }: { searchParams: SP }) {
                           {r.descricao ?? "—"}
                         </a>
                         {r.subcategoria && (
-                          <span className="badge mt-1 inline-block bg-violet-50 text-violet-700">{r.subcategoria}</span>
+                          <span className="badge mt-1 inline-block bg-violet-400/15 text-violet-300">{r.subcategoria}</span>
                         )}
                       </td>
                       <td className="num px-3 py-3 text-right text-[var(--muted)]">

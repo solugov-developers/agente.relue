@@ -59,7 +59,7 @@ function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="e-mail"
             autoComplete="username"
-            className="h-11 w-full rounded-xl border border-[var(--line)] bg-white px-4 text-sm outline-none focus:border-[var(--brand)]"
+            className="h-11 w-full rounded-xl border border-[var(--line)] bg-white/[0.06] px-4 text-sm text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--brand)]"
           />
           <input
             type="password"
@@ -67,7 +67,7 @@ function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="senha"
             autoComplete="current-password"
-            className="h-11 w-full rounded-xl border border-[var(--line)] bg-white px-4 text-sm outline-none focus:border-[var(--brand)]"
+            className="h-11 w-full rounded-xl border border-[var(--line)] bg-white/[0.06] px-4 text-sm text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--brand)]"
           />
           {err && <p className="text-sm text-[var(--neg)]">{err}</p>}
           <button

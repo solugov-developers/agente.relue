@@ -20,10 +20,10 @@ export default function AutoRefresh({ seconds = 15 }: { seconds?: number }) {
   return (
     <button
       onClick={() => setOn((o) => !o)}
-      className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs ring-1 ring-[var(--line)]"
+      className="inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3 py-1.5 text-xs ring-1 ring-[var(--line)]"
       title={on ? "Ao vivo (clique para pausar)" : "Pausado (clique para retomar)"}
     >
-      <span className={"h-2 w-2 rounded-full " + (on ? "animate-pulse bg-emerald-500" : "bg-gray-400")} />
+      <span className={"h-2 w-2 rounded-full " + (on ? "animate-pulse bg-emerald-400" : "bg-white/30")} />
       {on ? "ao vivo" : "pausado"}
       {on && <span className="num text-[var(--muted)]">· {tick}</span>}
     </button>

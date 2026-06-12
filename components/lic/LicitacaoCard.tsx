@@ -3,15 +3,15 @@ import { MapPin, CalendarDays, ExternalLink, ArrowUpRight } from "lucide-react";
 import type { LicRow } from "@/lib/licitacoes";
 
 const SUB_COLOR: Record<string, string> = {
-  "ERP/Gestão": "bg-violet-50 text-violet-700",
-  "Licenças/Software de prateleira": "bg-purple-50 text-purple-700",
-  "Cloud/Infraestrutura": "bg-indigo-50 text-indigo-700",
-  "Suporte/Manutenção de TI": "bg-slate-100 text-slate-600",
-  "Segurança da Informação": "bg-fuchsia-50 text-fuchsia-700",
-  "Desenvolvimento de Software": "bg-violet-100 text-violet-800",
-  "BI/Dados/IA": "bg-sky-50 text-sky-700",
-  "Telecom/Redes": "bg-cyan-50 text-cyan-700",
-  Outro: "bg-gray-100 text-gray-500",
+  "ERP/Gestão": "bg-violet-400/15 text-violet-300",
+  "Licenças/Software de prateleira": "bg-purple-400/15 text-purple-300",
+  "Cloud/Infraestrutura": "bg-indigo-400/15 text-indigo-300",
+  "Suporte/Manutenção de TI": "bg-slate-400/15 text-slate-300",
+  "Segurança da Informação": "bg-fuchsia-400/15 text-fuchsia-300",
+  "Desenvolvimento de Software": "bg-violet-400/20 text-violet-200",
+  "BI/Dados/IA": "bg-sky-400/15 text-sky-300",
+  "Telecom/Redes": "bg-cyan-400/15 text-cyan-300",
+  Outro: "bg-white/[0.07] text-[var(--muted)]",
 };
 
 const brl = (v: string | null) =>
@@ -21,14 +21,14 @@ const fmtDate = (s: string | null) =>
   !s ? null : new Date(s).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
 
 function deadline(enc: string | null, now: number) {
-  if (!enc) return { label: "Sem prazo definido", cls: "bg-gray-100 text-gray-500", dot: "bg-gray-400" };
+  if (!enc) return { label: "Sem prazo definido", cls: "bg-white/[0.07] text-[var(--muted)]", dot: "bg-white/30" };
   const t = new Date(enc).getTime();
-  if (t < now) return { label: "Encerrada", cls: "bg-gray-100 text-gray-400", dot: "bg-gray-300" };
+  if (t < now) return { label: "Encerrada", cls: "bg-white/[0.05] text-[var(--muted)]", dot: "bg-white/20" };
   const dias = Math.ceil((t - now) / 86400000);
-  if (dias === 0) return { label: "Encerra hoje", cls: "bg-red-50 text-red-600", dot: "bg-red-500" };
-  if (dias === 1) return { label: "Encerra amanhã", cls: "bg-amber-100 text-amber-700", dot: "bg-amber-500" };
-  if (dias <= 7) return { label: `Encerra em ${dias} dias`, cls: "bg-amber-100 text-amber-700", dot: "bg-amber-500" };
-  return { label: `${dias} dias restantes`, cls: "bg-emerald-50 text-emerald-700", dot: "bg-emerald-500" };
+  if (dias === 0) return { label: "Encerra hoje", cls: "bg-red-400/15 text-red-300", dot: "bg-red-400" };
+  if (dias === 1) return { label: "Encerra amanhã", cls: "bg-amber-400/15 text-amber-300", dot: "bg-amber-400" };
+  if (dias <= 7) return { label: `Encerra em ${dias} dias`, cls: "bg-amber-400/15 text-amber-300", dot: "bg-amber-400" };
+  return { label: `${dias} dias restantes`, cls: "bg-emerald-400/15 text-emerald-300", dot: "bg-emerald-400" };
 }
 
 function identificador(r: LicRow) {
@@ -51,7 +51,7 @@ export default function LicitacaoCard({ r, now }: { r: LicRow; now: number }) {
           {dl.label}
         </span>
         {r.subcategoria && (
-          <span className={"badge " + (SUB_COLOR[r.subcategoria] ?? "bg-gray-100 text-gray-500")}>
+          <span className={"badge " + (SUB_COLOR[r.subcategoria] ?? "bg-white/[0.07] text-[var(--muted)]")}>
             {r.subcategoria}
           </span>
         )}
@@ -61,10 +61,10 @@ export default function LicitacaoCard({ r, now }: { r: LicRow; now: number }) {
             className={
               "num badge ml-auto inline-flex items-center gap-1 " +
               (score >= 80
-                ? "bg-violet-100 text-violet-700"
+                ? "bg-violet-400/20 text-violet-200"
                 : score >= 60
-                  ? "bg-indigo-50 text-indigo-700"
-                  : "bg-gray-100 text-gray-500")
+                  ? "bg-indigo-400/15 text-indigo-300"
+                  : "bg-white/[0.07] text-[var(--muted)]")
             }
           >
             score {score}

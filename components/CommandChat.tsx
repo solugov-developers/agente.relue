@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import RelueOrb from "@/components/RelueOrb";
 
 type M = { role: "user" | "assistant"; content: string; sql?: string };
 
@@ -109,12 +110,12 @@ export default function CommandChat() {
       <aside
         aria-hidden={!open}
         className={
-          "glass-panel fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-white/40 shadow-[-12px_0_40px_-16px_rgba(16,24,40,0.3)] transition-transform duration-300 ease-out will-change-transform sm:w-[420px] " +
+          "glass-panel fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l border-white/10 shadow-[-16px_0_50px_-16px_rgba(2,2,8,0.7)] transition-transform duration-300 ease-out will-change-transform sm:w-[420px] " +
           (open ? "translate-x-0" : "pointer-events-none translate-x-full")
         }
       >
         <div className="flex items-center gap-3 border-b border-[var(--line)] px-4 py-3">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--brand-soft)] text-[var(--brand)]">✦</span>
+          <RelueOrb size={30} state={busy ? "thinking" : "idle"} />
           <div className="min-w-0">
             <div className="text-sm font-semibold">Relue</div>
             <div className="truncate text-xs text-[var(--muted)]">
@@ -166,8 +167,13 @@ export default function CommandChat() {
                 className={
                   "inline-block max-w-full rounded-xl px-3.5 py-2 text-sm " +
                   (m.role === "user"
-                    ? "bg-[var(--brand)] text-white"
-                    : "border border-white/60 bg-white/80 text-[var(--ink)]")
+                    ? "text-white"
+                    : "card text-[var(--ink)]")
+                }
+                style={
+                  m.role === "user"
+                    ? { background: "linear-gradient(135deg, hsl(217 91% 58%), hsl(262 83% 62%))" }
+                    : undefined
                 }
               >
                 {m.role === "assistant" ? (
@@ -198,14 +204,14 @@ export default function CommandChat() {
             e.preventDefault();
             send(input);
           }}
-          className="flex gap-2 border-t border-white/40 bg-white/30 p-3"
+          className="flex gap-2 border-t border-[var(--line)] bg-white/[0.03] p-3"
         >
           <input
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Pergunte ao Relue…"
-            className="flex-1 rounded-lg border border-[var(--line)] bg-white px-3 py-2 text-sm outline-none focus:border-[var(--brand)]"
+            className="flex-1 rounded-lg border border-[var(--line)] bg-white/[0.06] px-3 py-2 text-sm text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--brand)]"
           />
           <button
             disabled={busy}

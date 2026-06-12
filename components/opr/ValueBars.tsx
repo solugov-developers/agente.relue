@@ -15,7 +15,7 @@ const compact = (x: number) => {
 
 export default function ValueBars({ rows, accent = "violet", linkBase }: { rows: ValueRow[]; accent?: "violet" | "fuchsia"; linkBase?: string }) {
   const max = Math.max(1, ...rows.map((r) => r.value));
-  const fill = accent === "fuchsia" ? "#c026d3" : "#7c3aed";
+  const fill = accent === "fuchsia" ? "linear-gradient(90deg, #a855f7, #e879f9)" : "linear-gradient(90deg, #3b82f6, #8b5cf6)";
   return (
     <div className="space-y-3">
       {rows.map((r, i) => (

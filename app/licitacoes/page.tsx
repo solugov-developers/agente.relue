@@ -74,7 +74,7 @@ export default async function Licitacoes({ searchParams }: { searchParams: SP })
             {page > 1 && (
               <Link
                 href={mkHref(page - 1)}
-                className="rounded-full bg-white px-4 py-2 ring-1 ring-[var(--line)] transition hover:text-[var(--brand)]"
+                className="rounded-full bg-white/[0.06] px-4 py-2 ring-1 ring-[var(--line)] transition hover:bg-white/[0.1] hover:text-[var(--brand)]"
               >
                 ← Anterior
               </Link>
@@ -82,7 +82,7 @@ export default async function Licitacoes({ searchParams }: { searchParams: SP })
             {page < pages && (
               <Link
                 href={mkHref(page + 1)}
-                className="rounded-full bg-white px-4 py-2 ring-1 ring-[var(--line)] transition hover:text-[var(--brand)]"
+                className="rounded-full bg-white/[0.06] px-4 py-2 ring-1 ring-[var(--line)] transition hover:bg-white/[0.1] hover:text-[var(--brand)]"
               >
                 Próxima →
               </Link>

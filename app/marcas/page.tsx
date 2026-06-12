@@ -76,7 +76,7 @@ export default async function Marcas({ searchParams }: { searchParams: SP }) {
               </thead>
               <tbody>
                 {marcas.map((m, i) => (
-                  <tr key={m.marca} className="border-b border-[var(--line-soft)] hover:bg-white/50">
+                  <tr key={m.marca} className="border-b border-[var(--line-soft)] hover:bg-white/[0.04]">
                     <td className="num px-4 py-3 text-center text-[var(--muted)]">{i + 1}</td>
                     <td className="px-3 py-3">
                       <Link href={`/marcas?m=${encodeURIComponent(m.marca)}`} className="font-medium capitalize text-[var(--ink)] hover:text-[var(--brand)]">
@@ -87,7 +87,7 @@ export default async function Marcas({ searchParams }: { searchParams: SP }) {
                     <td className="num px-3 py-3 text-right font-medium text-[var(--ink)]">{compact(m.valor)}</td>
                     <td className="px-3 py-3 text-center">
                       {n(m.abertas) > 0 ? (
-                        <span className="badge bg-emerald-50 text-emerald-700">{int(m.abertas)}</span>
+                        <span className="badge bg-emerald-400/15 text-emerald-300">{int(m.abertas)}</span>
                       ) : (
                         <span className="text-[var(--muted)]">—</span>
                       )}
@@ -112,7 +112,7 @@ export default async function Marcas({ searchParams }: { searchParams: SP }) {
                   {m.marca}
                 </span>
                 {n(m.abertas) > 0 && (
-                  <span className="badge bg-emerald-50 text-emerald-700">{int(m.abertas)} abertas</span>
+                  <span className="badge bg-emerald-400/15 text-emerald-300">{int(m.abertas)} abertas</span>
                 )}
               </div>
               <div className="num mt-3 text-2xl font-bold text-[var(--ink)]">{compact(m.valor)}</div>

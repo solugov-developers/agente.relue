@@ -41,7 +41,7 @@ export default function Filters({ facets }: { facets: Facets }) {
   const activeCount = [uf, sub, mod, status === "abertas" ? "x" : "", qv].filter(Boolean).length;
 
   const sel =
-    "h-9 rounded-full border border-[var(--line)] bg-white px-3.5 text-sm text-[var(--ink-soft)] outline-none transition focus:border-[var(--brand)] hover:border-[var(--brand)]/50";
+    "h-9 rounded-full border border-[var(--line)] bg-white/[0.06] px-3.5 text-sm text-[var(--ink-soft)] outline-none transition focus:border-[var(--brand)] hover:border-[var(--brand)]/50 [&>option]:bg-[#15151c] [&>option]:text-[var(--ink)]";
 
   return (
     <div className="card mb-5 p-3.5">
@@ -53,12 +53,12 @@ export default function Filters({ facets }: { facets: Facets }) {
             value={qv}
             onChange={(e) => setQv(e.target.value)}
             placeholder="Buscar por objeto, órgão ou município…"
-            className="h-9 w-full rounded-full border border-[var(--line)] bg-white pl-9 pr-3 text-sm outline-none transition focus:border-[var(--brand)]"
+            className="h-9 w-full rounded-full border border-[var(--line)] bg-white/[0.06] pl-9 pr-3 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--brand)]"
           />
         </div>
 
         {/* abertas / todas */}
-        <div className="flex rounded-lg border border-[var(--line)] bg-white/60 p-0.5 text-xs">
+        <div className="flex rounded-lg border border-[var(--line)] bg-white/[0.05] p-0.5 text-xs">
           {[
             ["todas", "Todas"],
             ["abertas", "Só abertas"],

@@ -20,12 +20,17 @@ export const metadata: Metadata = {
   description: "Inteligência de mercado sobre licitações públicas de TI (base PNCP)",
 };
 
+export const viewport = {
+  themeColor: "#0a0a0f",
+  colorScheme: "dark" as const,
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${newsreader.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${inter.variable} ${newsreader.variable} h-full antialiased dark`}>
       <body className="min-h-full">
         <Sidebar />
-        <div className="lg:pl-[78px]">{children}</div>
+        <div className="pb-24 lg:pb-0 lg:pl-[78px]">{children}</div>
         <CommandChat />
       </body>
     </html>

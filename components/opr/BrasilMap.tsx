@@ -28,7 +28,7 @@ export default function BrasilMap({ counts }: { counts: Record<string, number> }
     return { paths: ps, max: mx };
   }, [geo, counts]);
 
-  const color = scaleSqrt<string, string>().domain([0, max]).range(["#f1ecfe", "#7c3aed"]);
+  const color = scaleSqrt<string, string>().domain([0, max]).range(["#1c1b2e", "#8b7bf0"]);
 
   return (
     <div className="relative">
@@ -39,7 +39,7 @@ export default function BrasilMap({ counts }: { counts: Record<string, number> }
             key={p.uf}
             d={p.d}
             fill={color(p.n)}
-            stroke="#e3dcfa"
+            stroke="rgba(255,255,255,0.14)"
             strokeWidth={0.6}
             onMouseEnter={() => setHover({ uf: p.uf, n: p.n })}
             onMouseLeave={() => setHover(null)}

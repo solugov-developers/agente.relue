@@ -23,7 +23,7 @@ export default function MarcaSearch({ initial }: { initial: string }) {
         value={v}
         onChange={(e) => setV(e.target.value)}
         placeholder="Buscar fabricante (Microsoft, Autodesk, SAP…)"
-        className="h-10 w-full rounded-full border border-[var(--line)] bg-white pl-10 pr-4 text-sm outline-none transition focus:border-[var(--brand)]"
+        className="h-10 w-full rounded-full border border-[var(--line)] bg-white/[0.06] pl-10 pr-4 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--brand)]"
       />
     </div>
   );

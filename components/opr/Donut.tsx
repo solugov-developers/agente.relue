@@ -2,7 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-const COLORS = ["#7c3aed", "#c026d3", "#4f46e5", "#a855f7", "#0ea5e9", "#db2777", "#64748b", "#8b5cf6"];
+const COLORS = ["#6366f1", "#a855f7", "#3b82f6", "#c084fc", "#22d3ee", "#e879f9", "#818cf8", "#60a5fa"];
 
 export default function Donut({ data }: { data: { name: string; value: number }[] }) {
   const total = data.reduce((s, d) => s + d.value, 0) || 1;
@@ -16,7 +16,7 @@ export default function Donut({ data }: { data: { name: string; value: number }[
             ))}
           </Pie>
           <Tooltip
-            contentStyle={{ background: "#fff", border: "1px solid #e7e9ee", borderRadius: 10, fontSize: 12 }}
+            contentStyle={{ background: "rgba(20,20,28,0.92)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, fontSize: 12, color: "#e7e9f0", backdropFilter: "blur(8px)" }}
             formatter={(v) => [Number(v).toLocaleString("pt-BR"), "licitações"]}
           />
         </PieChart>

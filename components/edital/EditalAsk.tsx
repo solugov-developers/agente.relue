@@ -56,7 +56,7 @@ export default function EditalAsk({ pncpId }: { pncpId: string }) {
             key={s}
             onClick={() => ask(s)}
             disabled={busy}
-            className="rounded-full bg-white px-3 py-1.5 text-xs text-[var(--ink-soft)] ring-1 ring-[var(--line)] transition hover:border-[var(--brand)] hover:text-[var(--brand)] disabled:opacity-50"
+            className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-[var(--ink-soft)] ring-1 ring-[var(--line)] transition hover:bg-white/[0.1] hover:text-[var(--brand)] disabled:opacity-50"
           >
             {s}
           </button>
@@ -74,7 +74,7 @@ export default function EditalAsk({ pncpId }: { pncpId: string }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ex.: quais itens têm maior valor?"
-          className="h-10 flex-1 rounded-full border border-[var(--line)] bg-white px-4 text-sm outline-none focus:border-[var(--brand)]"
+          className="h-10 flex-1 rounded-full border border-[var(--line)] bg-white/[0.06] px-4 text-sm text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--brand)]"
         />
         <button
           disabled={busy || !input.trim()}

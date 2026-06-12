@@ -68,8 +68,8 @@ export default async function Sync() {
         <div className="card p-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-semibold text-[var(--ink)]">1 · Ingestão (nuvem)</h3>
-            <span className={"badge inline-flex items-center gap-1.5 " + (pp.ingerindo ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500")}>
-              <span className={"h-1.5 w-1.5 rounded-full " + (pp.ingerindo ? "animate-pulse bg-emerald-500" : "bg-gray-400")} />
+            <span className={"badge inline-flex items-center gap-1.5 " + (pp.ingerindo ? "bg-emerald-400/15 text-emerald-300" : "bg-white/[0.07] text-[var(--muted)]")}>
+              <span className={"h-1.5 w-1.5 rounded-full " + (pp.ingerindo ? "animate-pulse bg-emerald-400" : "bg-white/30")} />
               {pp.ingerindo ? "ingerindo" : "ocioso"}
             </span>
           </div>
@@ -87,8 +87,8 @@ export default async function Sync() {
         <div className="card p-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-semibold text-[var(--ink)]">2 · Classificação (IA)</h3>
-            <span className={"badge inline-flex items-center gap-1.5 " + (pp.classificando ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-500")}>
-              <span className={"h-1.5 w-1.5 rounded-full " + (pp.classificando ? "animate-pulse bg-emerald-500" : "bg-gray-400")} />
+            <span className={"badge inline-flex items-center gap-1.5 " + (pp.classificando ? "bg-emerald-400/15 text-emerald-300" : "bg-white/[0.07] text-[var(--muted)]")}>
+              <span className={"h-1.5 w-1.5 rounded-full " + (pp.classificando ? "animate-pulse bg-emerald-400" : "bg-white/30")} />
               {pp.classificando ? "classificando" : "ocioso"}
             </span>
           </div>

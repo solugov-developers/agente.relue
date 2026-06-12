@@ -44,7 +44,8 @@ export default function Sidebar() {
         <Link
           href="/"
           aria-label="Relue"
-          className="dock-floating grid h-11 w-11 place-items-center rounded-2xl text-base font-bold text-[var(--brand)]"
+          className="grid h-11 w-11 place-items-center rounded-2xl text-base font-bold text-white shadow-[0_6px_18px_-4px_hsl(243_80%_55%/0.6)]"
+          style={{ background: "linear-gradient(135deg, hsl(217 91% 60%), hsl(262 83% 64%))" }}
         >
           R
         </Link>
@@ -71,7 +72,7 @@ export default function Sidebar() {
                 {active && (
                   <span
                     aria-hidden
-                    className="absolute -right-1.5 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full bg-[var(--brand)] shadow-[0_0_10px_hsl(262_83%_58%/0.6)]"
+                    className="absolute -right-1.5 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full bg-[var(--blue)] shadow-[0_0_12px_hsl(217_91%_60%/0.8)]"
                   />
                 )}
               </Link>
@@ -84,7 +85,8 @@ export default function Sidebar() {
         {user && (
           <div
             title={`${user.nome || user.email}`}
-            className="mb-1 grid h-9 w-9 place-items-center rounded-full bg-[var(--brand)] text-sm font-semibold text-white"
+            className="mb-1 grid h-9 w-9 place-items-center rounded-full text-sm font-semibold text-white shadow-[0_4px_12px_-2px_hsl(243_80%_55%/0.5)]"
+            style={{ background: "linear-gradient(135deg, hsl(217 91% 58%), hsl(289 80% 60%))" }}
           >
             {initial}
           </div>
@@ -99,38 +101,34 @@ export default function Sidebar() {
         </button>
       </aside>
 
-      {/* topo — mobile */}
-      <div className="surface-frost sticky top-0 z-40 flex items-center gap-1 px-3 py-2.5 lg:hidden">
-        <Link href="/" className="mr-1 grid h-8 w-8 place-items-center rounded-xl bg-[var(--brand)] text-sm font-bold text-white">
-          R
-        </Link>
+      {/* dock inferior — mobile (estilo Nixtio) */}
+      <nav className="surface-frost fixed inset-x-3 bottom-3 z-40 flex items-center justify-around rounded-3xl px-2 py-2 shadow-[0_12px_32px_-8px_hsl(240_50%_2%/0.7)] lg:hidden">
         {NAV.map((n) => {
           const active = isActive(n.href);
+          const Icon = n.icon;
           return (
             <Link
               key={n.href}
               href={n.href}
+              aria-label={n.label}
+              aria-current={active ? "page" : undefined}
               className={
-                "rounded-lg px-3 py-1.5 text-xs font-medium transition " +
-                (active ? "bg-[var(--ink)] text-white" : "text-[var(--ink-soft)] hover:text-[var(--brand)]")
+                "grid h-11 w-11 place-items-center rounded-2xl transition " +
+                (active ? "dock-floating-active" : "text-[var(--ink-soft)] active:scale-95")
               }
             >
-              {n.label}
+              <Icon size={19} strokeWidth={2} />
             </Link>
           );
         })}
-        <div className="ml-auto flex items-center gap-2">
-          {user && (
-            <span className="hidden items-center gap-1.5 text-xs text-[var(--ink-soft)] sm:flex">
-              <span className="grid h-6 w-6 place-items-center rounded-full bg-[var(--brand)] text-[11px] font-semibold text-white">{initial}</span>
-              {primeiro}
-            </span>
-          )}
-          <button onClick={logout} title="Sair" className="rounded-lg px-2.5 py-1.5 text-[var(--ink-soft)] hover:text-[var(--neg)]">
-            <LogOut size={16} />
-          </button>
-        </div>
-      </div>
+        <button
+          onClick={logout}
+          aria-label="Sair"
+          className="grid h-11 w-11 place-items-center rounded-2xl text-[var(--muted)] active:scale-95"
+        >
+          <LogOut size={18} strokeWidth={2} />
+        </button>
+      </nav>
     </>
   );
 }

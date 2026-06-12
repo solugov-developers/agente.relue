@@ -22,7 +22,7 @@ export default function ViewToggle() {
   ];
 
   return (
-    <div className="inline-flex rounded-full border border-[var(--line)] bg-white p-0.5 text-xs">
+    <div className="inline-flex rounded-full border border-[var(--line)] bg-white/[0.05] p-0.5 text-xs">
       {opts.map(({ v, label, Icon }) => (
         <button
           key={v}
