@@ -28,7 +28,7 @@ export default function BrasilMap({ counts }: { counts: Record<string, number> }
     return { paths: ps, max: mx };
   }, [geo, counts]);
 
-  const color = scaleSqrt<string, string>().domain([0, max]).range(["#1c1b2e", "#8b7bf0"]);
+  const color = scaleSqrt<string, string>().domain([0, max]).range(["#15262b", "#2596b8"]);
 
   return (
     <div className="relative">

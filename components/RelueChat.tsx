@@ -21,17 +21,30 @@ const CARDS: { icon: typeof Target; title: string; desc: string; q: string }[] =
   { icon: DollarSign, title: "Benchmark de preços", desc: "Preço praticado por produto/serviço.", q: "Ticket mediano por segmento de TI" },
 ];
 
+const PLACEHOLDERS = [
+  "Quais oportunidades de ERP estão abertas?",
+  "Quanto o governo paga por Microsoft 365?",
+  "Top fabricantes em segurança da informação",
+  "Maiores licitações de TI abertas em SP",
+  "Evolução das compras de nuvem nos últimos 12 meses",
+];
+
 export default function RelueChat() {
   const [msgs, setMsgs] = useState<M[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [nome, setNome] = useState("");
+  const [phIdx, setPhIdx] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs, busy]);
+  useEffect(() => {
+    const t = setInterval(() => setPhIdx((i) => (i + 1) % PLACEHOLDERS.length), 3400);
+    return () => clearInterval(t);
+  }, []);
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -106,10 +119,6 @@ export default function RelueChat() {
       }}
       className="surface-frost mx-auto w-full max-w-2xl rounded-[24px] p-2 shadow-[0_24px_60px_-20px_hsl(240_50%_1%/0.8)]"
     >
-      <div className="flex items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-[var(--muted)]">
-        <span className="h-1.5 w-1.5 rounded-full bg-[var(--pos)]" />
-        Conectado à base PNCP · inteligência de licitações de TI
-      </div>
       <div className="rounded-[18px] border border-[var(--line)] bg-black/30 p-2.5">
         <textarea
           ref={inputRef}
@@ -122,8 +131,8 @@ export default function RelueChat() {
             }
           }}
           rows={1}
-          placeholder="Pergunte qualquer coisa…"
-          className="max-h-40 min-h-[40px] w-full resize-none bg-transparent px-2 py-1.5 text-[15px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]"
+          placeholder={PLACEHOLDERS[phIdx]}
+          className="max-h-40 min-h-[40px] w-full resize-none bg-transparent px-2 py-1.5 text-[15px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] placeholder:transition-opacity"
         />
         <div className="mt-1 flex items-center gap-2">
           <div className="flex flex-wrap gap-1.5">
@@ -141,7 +150,7 @@ export default function RelueChat() {
           <button
             disabled={busy || !input.trim()}
             aria-label="Enviar"
-            className="ml-auto grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--blue)] text-white shadow-[0_6px_18px_-4px_hsl(211_100%_50%/0.7)] transition hover:brightness-110 disabled:opacity-40"
+            className="ml-auto grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--blue)] text-white shadow-[0_6px_18px_-4px_hsl(194_80%_40%/0.7)] transition hover:brightness-110 disabled:opacity-40"
           >
             <ArrowUp size={19} strokeWidth={2.4} />
           </button>

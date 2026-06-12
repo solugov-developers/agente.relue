@@ -3,7 +3,8 @@ import { q } from "./db";
 export type Num = string | number | null;
 export type Row = Record<string, Num>;
 
-export async function getOpr() {
+export async function getOpr(months = 12) {
+  const m = [6, 12, 18].includes(months) ? months : 12;
   const safe = (sql: string): Promise<Row[]> => (q(sql) as Promise<Row[]>).catch(() => [] as Row[]);
 
   // todas as consultas em PARALELO (antes eram sequenciais -> navegação lenta)
@@ -45,13 +46,13 @@ export async function getOpr() {
       `select to_char(date_trunc('month', data_publicacao_pncp), 'YYYY-MM') mes, count(*) n,
               coalesce(sum(valor_total_estimado) filter (where valor_total_estimado < 999999999),0) valor
        from public.licitacoes_ti
-       where e_ti and data_publicacao_pncp >= (now() - interval '12 months')
+       where e_ti and data_publicacao_pncp >= (now() - interval '${m} months')
        group by 1 order by 1`
     ),
     safe(
       `select subcategoria, to_char(date_trunc('month', data_publicacao_pncp), 'YYYY-MM') mes, count(*) n
        from public.licitacoes_ti
-       where e_ti and data_publicacao_pncp >= (now() - interval '12 months')
+       where e_ti and data_publicacao_pncp >= (now() - interval '${m} months')
        group by 1, 2 order by 2`
     ),
     // onde está o dinheiro — valor em jogo por segmento

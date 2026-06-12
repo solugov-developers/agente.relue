@@ -52,6 +52,13 @@ export default async function Licitacoes({ searchParams }: { searchParams: SP })
 
       <Filters facets={facets} />
 
+      <div className="mb-3 flex items-baseline justify-between">
+        <span className="text-sm text-[var(--muted)]">
+          <b className="num text-[var(--ink-soft)]">{total.toLocaleString("pt-BR")}</b> resultado{total === 1 ? "" : "s"}
+        </span>
+        {pages > 1 && <span className="text-xs text-[var(--muted)]">página {page} de {pages}</span>}
+      </div>
+
       {rows.length === 0 ? (
         <div className="card p-14 text-center text-[var(--muted)]">
           Nenhuma licitação encontrada com esses filtros.

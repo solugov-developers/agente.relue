@@ -9,10 +9,10 @@ export default function Bars({ rows, accent = "blue", linkBase }: { rows: Bar[];
   const max = Math.max(1, ...rows.map((r) => r.n));
   const fill =
     accent === "amber"
-      ? "linear-gradient(90deg, #a855f7, #e879f9)"
+      ? "linear-gradient(90deg, #2596b8, #7fd6e6)"
       : accent === "green"
-        ? "linear-gradient(90deg, #4f46e5, #8b5cf6)"
-        : "linear-gradient(90deg, #3b82f6, #8b5cf6)";
+        ? "linear-gradient(90deg, #0e5f77, #167591)"
+        : "linear-gradient(90deg, #167591, #2596b8)";
   return (
     <div className="space-y-2.5">
       {rows.map((r, i) => (

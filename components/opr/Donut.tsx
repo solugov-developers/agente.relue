@@ -2,7 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-const COLORS = ["#6366f1", "#a855f7", "#3b82f6", "#c084fc", "#22d3ee", "#e879f9", "#818cf8", "#60a5fa"];
+const COLORS = ["#167591", "#2596b8", "#7fd6e6", "#0e5f77", "#22d3ee", "#3b9fc0", "#5fc4dc", "#0c4254"];
 
 export default function Donut({ data }: { data: { name: string; value: number }[] }) {
   const total = data.reduce((s, d) => s + d.value, 0) || 1;
