@@ -46,6 +46,6 @@ export async function GET(req: NextRequest) {
           : `${(e as Error).message}${cause ? " | " + (cause.code || cause.message) : ""}`;
     }
   }
-  if (debug) return Response.json({ error: lastErr || "desconhecido" });
+  if (debug) return Response.json({ error: lastErr || "desconhecido", region: process.env.VERCEL_REGION ?? "?" });
   return Response.json([]);
 }
