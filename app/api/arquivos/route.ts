@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
+// PNCP recusa IPs de nuvem dos EUA -> rodar em São Paulo (IP BR)
+export const preferredRegion = "gru1";
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
@@ -37,7 +39,11 @@ export async function GET(req: NextRequest) {
       if (res.ok) return Response.json(res.data);
       lastErr = "http " + res.status;
     } catch (e) {
-      lastErr = (e as Error).name === "AbortError" ? "timeout" : (e as Error).message;
+      const cause = (e as { cause?: { code?: string; message?: string } }).cause;
+      lastErr =
+        (e as Error).name === "AbortError"
+          ? "timeout"
+          : `${(e as Error).message}${cause ? " | " + (cause.code || cause.message) : ""}`;
     }
   }
   if (debug) return Response.json({ error: lastErr || "desconhecido" });
