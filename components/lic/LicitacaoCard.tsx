@@ -20,8 +20,12 @@ const brl = (v: string | null) =>
 const fmtDate = (s: string | null) =>
   !s ? null : new Date(s).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
 
-function deadline(enc: string | null, now: number) {
-  if (!enc) return { label: "Sem prazo definido", cls: "bg-white/[0.07] text-[var(--muted)]", dot: "bg-white/30" };
+function deadline(enc: string | null, now: number, modalidade?: string | null) {
+  if (!enc) {
+    if (/dispensa|inexig/i.test(modalidade ?? ""))
+      return { label: "Contratação direta", cls: "bg-white/[0.07] text-[var(--ink-soft)]", dot: "bg-white/30" };
+    return { label: "Sem prazo definido", cls: "bg-white/[0.07] text-[var(--muted)]", dot: "bg-white/30" };
+  }
   const t = new Date(enc).getTime();
   if (t < now) return { label: "Encerrada", cls: "bg-white/[0.05] text-[var(--muted)]", dot: "bg-white/20" };
   const dias = Math.ceil((t - now) / 86400000);
@@ -38,7 +42,7 @@ function identificador(r: LicRow) {
 }
 
 export default function LicitacaoCard({ r, now }: { r: LicRow; now: number }) {
-  const dl = deadline(r.data_encerramento_proposta, now);
+  const dl = deadline(r.data_encerramento_proposta, now, r.modalidade_nome);
   const valor = brl(r.valor_total_estimado);
   const score = r.score_oportunidade == null ? null : Number(r.score_oportunidade);
 

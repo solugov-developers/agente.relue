@@ -44,6 +44,8 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
   const l = d.lic as Record<string, unknown>;
   const somaItens = d.itens.reduce((s, it) => s + n(it.valor_total), 0);
   const aberta = l.data_encerramento_proposta ? new Date(String(l.data_encerramento_proposta)).getTime() >= Date.now() : false;
+  // contratação direta (dispensa/inexigibilidade de fornecedor único) não tem fase de proposta → sem prazo
+  const direta = !l.data_encerramento_proposta && /dispensa|inexig/i.test(String(l.modalidade_nome ?? ""));
 
   const info = [
     { label: "Valor estimado", value: brl0(l.valor_total_estimado), accent: true },
@@ -51,7 +53,7 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
     { label: "Esfera", value: ESFERA[String(l.esfera_id)] ?? "—" },
     { label: "Itens", value: d.itens.length.toLocaleString("pt-BR") },
     { label: "Publicação", value: fmt(l.data_publicacao_pncp) },
-    { label: "Encerramento", value: fmt(l.data_encerramento_proposta) },
+    { label: "Encerramento", value: direta ? "Contratação direta" : fmt(l.data_encerramento_proposta) },
   ];
 
   return (
@@ -64,7 +66,7 @@ export default async function Edital({ searchParams }: { searchParams: SP }) {
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <span className={"badge inline-flex items-center gap-1.5 px-2.5 py-1 " + (aberta ? "bg-emerald-400/15 text-emerald-300" : "bg-white/[0.07] text-[var(--muted)]")}>
           <span className={"h-1.5 w-1.5 rounded-full " + (aberta ? "bg-emerald-400" : "bg-white/30")} />
-          {aberta ? "Aberta" : "Encerrada / sem prazo"}
+          {aberta ? "Aberta" : direta ? "Contratação direta" : "Encerrada / sem prazo"}
         </span>
         {l.subcategoria != null && <span className="badge bg-violet-400/15 text-violet-300">{String(l.subcategoria)}</span>}
         {l.score_oportunidade != null && (
