@@ -92,6 +92,70 @@ async function sniffAndExtract(buf: Uint8Array, hintName = "", depth = 0): Promi
   }
 }
 
+// Editais têm 100k-300k chars; a habilitação/qualificação costuma ficar lá pra
+// frente. Em vez de cortar cego no começo, mantém o início + janelas ao redor
+// das seções que importam (em ordem do documento), cabendo no orçamento.
+function condensar(full: string, budget: number): string {
+  if (full.length <= budget) return full;
+  const low = full.toLowerCase();
+  const HEAD = 12000;
+  const WIN = 7000;
+  const BACK = 900;
+  // menor prioridade = entra primeiro. A habilitação/qualificação é o que mais
+  // se pergunta e fica lá pro fim do edital — usa os nomes canônicos das seções
+  // (Lei 14.133) pra mirar o conteúdo real, não a menção no sumário. Terceiro
+  // número = máx. de ocorrências consideradas por chave.
+  const KEYS: [string, number, number][] = [
+    ["qualifica[cç][aã]o t[eé]cnica", 1, 2],
+    ["qualifica[cç][aã]o econ", 1, 2],
+    ["qualifica[cç][aã]o jur", 1, 2],
+    ["regularidade fiscal", 1, 2],
+    ["habilita[cç][aã]o t[eé]cnica", 1, 2],
+    ["documentos?.{0,8}habilita", 1, 2],
+    ["julgamento", 2, 2], ["crit[eé]rio", 2, 2], ["proposta", 2, 2],
+    ["garantia", 2, 1], ["prazo de entrega", 2, 1], ["prazo de execu", 2, 1],
+    ["habilita", 2, 2],
+    ["pagamento", 3, 2], ["penalidad", 3, 1], ["san[cç][aã]o", 3, 1],
+    ["vig[eê]ncia", 3, 1], ["dota[cç][aã]o", 3, 1], ["valor estimad", 3, 1], ["reajuste", 3, 1],
+  ];
+  type Rng = { s: number; e: number; p: number };
+  const cands: Rng[] = [{ s: 0, e: HEAD, p: 0 }];
+  for (const [k, p, max] of KEYS) {
+    const re = new RegExp(k, "gi");
+    let m: RegExpExecArray | null;
+    let count = 0;
+    while ((m = re.exec(low)) && count < max) {
+      cands.push({ s: Math.max(0, m.index - BACK), e: m.index + WIN, p });
+      re.lastIndex = m.index + WIN;
+      count++;
+    }
+  }
+  const mergeRanges = (rs: Rng[]): Rng[] => {
+    const sorted = [...rs].sort((a, b) => a.s - b.s);
+    const mg: Rng[] = [];
+    for (const r of sorted) {
+      const last = mg[mg.length - 1];
+      if (last && r.s <= last.e + 200) last.e = Math.max(last.e, r.e);
+      else mg.push({ ...r });
+    }
+    return mg;
+  };
+  const covered = (rs: Rng[]) =>
+    mergeRanges(rs).reduce((n, r) => n + (Math.min(r.e, full.length) - r.s), 0);
+  // adiciona janelas por prioridade, sem estourar o orçamento
+  cands.sort((a, b) => a.p - b.p || a.s - b.s);
+  const accepted: Rng[] = [];
+  for (const c of cands) {
+    accepted.push(c);
+    if (covered(accepted) > budget) accepted.pop();
+  }
+  let out = "";
+  for (const r of mergeRanges(accepted)) {
+    out += (r.s > 0 ? "\n\n[...]\n\n" : "") + full.slice(r.s, Math.min(r.e, full.length));
+  }
+  return out.slice(0, budget);
+}
+
 async function baixar(url: string, timeoutMs = 22000): Promise<{ buf: Uint8Array; cd: string } | null> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
@@ -110,7 +174,7 @@ export async function fetchEditalTexto(
   cnpj: string,
   ano: string | number,
   seq: string | number,
-  maxChars = 30000
+  maxChars = 55000
 ): Promise<{ texto: string; partes: string[]; avisos: string[] }> {
   if (!cnpj || !ano || !seq) return { texto: "", partes: [], avisos: [] };
   const ctrl = new AbortController();
@@ -144,8 +208,9 @@ export async function fetchEditalTexto(
   let out = "";
   const partes: string[] = [];
   const avisos: string[] = [];
+  const RAW_CAP = 300000; // acumula bruto; condensa por seções no fim
   for (const a of arqs.slice(0, 5)) {
-    if (out.length >= maxChars) break;
+    if (out.length >= RAW_CAP) break;
     const doc = a.sequencialDocumento || 1;
     const titulo = String(a.titulo || "documento");
     const dl = await baixar(`https://pncp.gov.br/pncp-api/v1/orgaos/${cnpj}/compras/${ano}/${seq}/arquivos/${doc}`);
@@ -159,5 +224,5 @@ export async function fetchEditalTexto(
       avisos.push(`${titulo}: ${aviso}`);
     }
   }
-  return { texto: out.slice(0, maxChars).trim(), partes, avisos };
+  return { texto: condensar(out.trim(), maxChars), partes, avisos };
 }
