@@ -1,14 +1,18 @@
 import { NextRequest } from "next/server";
 import { getEdital } from "@/lib/edital";
+import { fetchEditalTexto } from "@/lib/editalDoc";
 import { azureChatStream } from "@/lib/azure";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
+// baixar o PDF do PNCP exige IP BR (PNCP recusa nuvem dos EUA)
+export const preferredRegion = "gru1";
 
 const SYS = `Voce e o Relue, analista de licitacoes de TI da Solugov. Responda em portugues, claro e objetivo,
-SOMENTE com base nos dados do edital fornecido (NAO invente). Pode resumir o objeto, destacar/agrupar itens,
-comentar valor, prazos, modalidade e possiveis riscos/oportunidades comerciais. Use markdown (listas/tabela) quando ajudar.
-Se a informacao nao constar no contexto, diga que nao consta no edital.`;
+SOMENTE com base nos dados e no TEXTO DO EDITAL fornecidos (NAO invente). Quando houver "TEXTO DO ARQUIVO DO EDITAL",
+use-o como fonte principal (ele e o conteudo real do PDF): resuma o objeto, extraia requisitos/habilitacao/prazos/
+criterios de julgamento, valor, e aponte riscos e oportunidades comerciais. Use markdown (listas/tabela) quando ajudar.
+Se a informacao nao constar no que foi fornecido, diga que nao consta.`;
 
 export async function POST(req: NextRequest) {
   const enc = new TextEncoder();
@@ -30,6 +34,12 @@ export async function POST(req: NextRequest) {
     )
     .join("\n");
 
+  // baixa e extrai o texto do PDF do edital (se houver)
+  const doc = await fetchEditalTexto(String(l.cnpj_orgao ?? ""), String(l.ano_compra ?? ""), String(l.sequencial_compra ?? ""));
+  const docBloco = doc.texto
+    ? `\n\nTEXTO DO ARQUIVO DO EDITAL (${doc.titulo || "edital"} — extraído do PDF):\n${doc.texto}`
+    : `\n\n(Arquivo do edital: ${doc.aviso ?? "não lido"} — responda com base nos dados acima.)`;
+
   const ctx = `EDITAL ${pncpId}
 Órgão: ${l.orgao_entidade} (${l.municipio ?? ""}/${l.uf ?? ""})
 Modalidade: ${l.modalidade_nome ?? "—"} | Situação: ${l.situacao_compra_nome ?? "—"}
@@ -39,7 +49,7 @@ Valor total estimado: R$ ${l.valor_total_estimado ?? "—"}
 Publicação: ${l.data_publicacao_pncp ?? "—"} | Encerramento de propostas: ${l.data_encerramento_proposta ?? "—"}
 Marcas/fabricantes citados: ${d.marcas.join(", ") || "—"}
 ITENS (${d.itens.length} no total):
-${itensTxt}`;
+${itensTxt}${docBloco}`;
 
   const gen = azureChatStream([
     { role: "system", content: SYS },

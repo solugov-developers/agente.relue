@@ -18,7 +18,15 @@ async function fetchArquivos(cnpj: string, ano: string, seq: string, timeoutMs: 
     );
     if (!r.ok) return { ok: false, status: r.status, data: [] as unknown[] };
     const d = await r.json();
-    return { ok: true, status: 200, data: Array.isArray(d) ? d : [] };
+    // O PNCP devolve url/uri numa PORTA interna (ex.: :58899) que o navegador não alcança.
+    // Reescreve p/ a porta padrão (443), que serve o arquivo (content-disposition: attachment).
+    const fixPort = (u?: string) => (u ? u.replace(/(pncp\.gov\.br):\d+/i, "$1") : u);
+    const data = (Array.isArray(d) ? d : []).map((a: Record<string, unknown>) => ({
+      ...a,
+      url: fixPort(a.url as string) ?? fixPort(a.uri as string),
+      uri: fixPort(a.uri as string),
+    }));
+    return { ok: true, status: 200, data };
   } finally {
     clearTimeout(t);
   }
