@@ -12,6 +12,20 @@ function decodeXml(s: string): string {
     .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&#(\d+);/g, (_, d) => String.fromCharCode(+d));
 }
 
+// Editais assinados repetem carimbos de assinatura eletrônica/e-protocolo em
+// toda página (chega a 13% do arquivo) — puro ruído que come orçamento e
+// atrapalha a IA. Remove os blocos de boilerplate mais comuns no Brasil.
+function limparRuido(s: string): string {
+  return s
+    .replace(/Assinatura Avançada realizada por[\s\S]{0,600}?validarDocumento com o c[oó]digo:\s*\S+/gi, " ")
+    .replace(/Assinado (digital|eletr[oô]nic)[a-z]*\s+por:?[\s\S]{0,240}?(https?:\/\/\S+|c[oó]digo:?\s*\S{6,})/gi, " ")
+    .replace(/Inserido ao protocolo[\s\S]{0,260}?por:[^.\n]{0,140}\./gi, " ")
+    .replace(/Documento assinado nos termos do Art\.[\s\S]{0,280}?(https?:\/\/\S+|c[oó]digo:?\s*\S+)/gi, " ")
+    .replace(/A autenticidade (deste|do) documento pode ser (validad|conferid|verificad)[\s\S]{0,240}?(https?:\/\/\S+)/gi, " ")
+    .replace(/https?:\/\/\S*validar\S*/gi, " ")
+    .replace(/Assinatura Avançada realizada por:[^\n]{0,180}/gi, " ");
+}
+
 async function extractPdf(buf: Uint8Array): Promise<string> {
   const { extractText, getDocumentProxy } = await import("unpdf");
   const pdf = await getDocumentProxy(buf);
@@ -218,7 +232,7 @@ export async function fetchEditalTexto(
     const nameHint = (dl.cd.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i) || [])[1] || titulo;
     const { texto, aviso } = await sniffAndExtract(dl.buf, nameHint);
     if (texto) {
-      out += `\n\n===== ${titulo} =====\n` + texto.replace(/[ \t]{2,}/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+      out += `\n\n===== ${titulo} =====\n` + limparRuido(texto).replace(/[ \t]{2,}/g, " ").replace(/\n{3,}/g, "\n\n").trim();
       partes.push(titulo);
     } else if (aviso) {
       avisos.push(`${titulo}: ${aviso}`);
