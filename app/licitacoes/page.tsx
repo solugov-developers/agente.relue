@@ -2,7 +2,7 @@ import Link from "next/link";
 import { listFacets, listLicitacoes, type LicFilters } from "@/lib/licitacoes";
 import Filters from "@/components/lic/Filters";
 import PageHeader from "@/components/PageHeader";
-import LicitacaoCard from "@/components/lic/LicitacaoCard";
+import LicList from "@/components/lic/LicList";
 
 export const dynamic = "force-dynamic";
 
@@ -64,11 +64,7 @@ export default async function Licitacoes({ searchParams }: { searchParams: SP })
           Nenhuma licitação encontrada com esses filtros.
         </div>
       ) : (
-        <div className="grid gap-3 lg:grid-cols-2">
-          {rows.map((r) => (
-            <LicitacaoCard key={r.pncp_id} r={r} now={now} />
-          ))}
-        </div>
+        <LicList rows={rows} now={now} />
       )}
 
       {/* paginação */}

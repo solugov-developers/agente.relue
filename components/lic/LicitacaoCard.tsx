@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { MapPin, CalendarDays, ExternalLink, ArrowUpRight } from "lucide-react";
+import { MapPin, CalendarDays, CalendarClock, ExternalLink, ArrowUpRight } from "lucide-react";
 import type { LicRow } from "@/lib/licitacoes";
 
 const SUB_COLOR: Record<string, string> = {
@@ -41,7 +43,15 @@ function identificador(r: LicRow) {
   return [m, seq && r.data_publicacao_pncp ? `${seq}` : ""].filter(Boolean).join(" ");
 }
 
-export default function LicitacaoCard({ r, now }: { r: LicRow; now: number }) {
+export default function LicitacaoCard({
+  r,
+  now,
+  onOpen,
+}: {
+  r: LicRow;
+  now: number;
+  onOpen?: (id: string) => void;
+}) {
   const dl = deadline(r.data_encerramento_proposta, now, r.modalidade_nome);
   const valor = brl(r.valor_total_estimado);
   const score = r.score_oportunidade == null ? null : Number(r.score_oportunidade);
@@ -89,8 +99,8 @@ export default function LicitacaoCard({ r, now }: { r: LicRow; now: number }) {
         {r.resumo || r.objeto_compra || "—"}
       </p>
 
-      {/* metadados */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] text-[var(--muted)]">
+      {/* datas: publicação × abertura */}
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-[var(--muted)]">
         {(r.municipio || r.uf) && (
           <span className="inline-flex items-center gap-1.5">
             <MapPin size={13} className="opacity-60" strokeWidth={2} />
@@ -98,28 +108,49 @@ export default function LicitacaoCard({ r, now }: { r: LicRow; now: number }) {
           </span>
         )}
         {r.data_publicacao_pncp && (
-          <span className="num inline-flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-1.5">
             <CalendarDays size={13} className="opacity-60" strokeWidth={2} />
-            {fmtDate(r.data_publicacao_pncp)}
+            <span className="text-[var(--muted)]/80">Publicação</span>
+            <span className="num text-[var(--ink-soft)]">{fmtDate(r.data_publicacao_pncp)}</span>
           </span>
         )}
-        <span className="num ml-auto">
+        {r.data_abertura_proposta && (
+          <span className="inline-flex items-center gap-1.5">
+            <CalendarClock size={13} className="opacity-60" strokeWidth={2} />
+            <span className="text-[var(--muted)]/80">Abertura</span>
+            <span className="num text-[var(--ink-soft)]">{fmtDate(r.data_abertura_proposta)}</span>
+          </span>
+        )}
+      </div>
+
+      <div className="mt-2 text-right">
+        <span className="num">
           {valor ? (
             <span className="text-[15px] font-semibold text-[var(--ink)]">{valor}</span>
           ) : (
-            <span className="text-[var(--muted)]/70">valor não informado</span>
+            <span className="text-[12px] text-[var(--muted)]/70">valor não informado</span>
           )}
         </span>
       </div>
 
       {/* rodapé */}
       <div className="mt-5 flex items-center justify-between gap-2 border-t border-[var(--line-soft)] pt-4">
-        <Link
-          href={`/edital?id=${encodeURIComponent(r.pncp_id)}`}
-          className="inline-flex items-center gap-1 text-[12.5px] font-medium text-[var(--ink-soft)] transition hover:text-[var(--brand)]"
-        >
-          Ver detalhe <ArrowUpRight size={13} />
-        </Link>
+        {onOpen ? (
+          <button
+            type="button"
+            onClick={() => onOpen(r.pncp_id)}
+            className="inline-flex items-center gap-1 text-[12.5px] font-medium text-[var(--ink-soft)] transition hover:text-[var(--brand)]"
+          >
+            Ver detalhe <ArrowUpRight size={13} />
+          </button>
+        ) : (
+          <Link
+            href={`/edital?id=${encodeURIComponent(r.pncp_id)}`}
+            className="inline-flex items-center gap-1 text-[12.5px] font-medium text-[var(--ink-soft)] transition hover:text-[var(--brand)]"
+          >
+            Ver detalhe <ArrowUpRight size={13} />
+          </Link>
+        )}
         {r.link ? (
           <a
             href={r.link}

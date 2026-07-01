@@ -21,6 +21,7 @@ export type LicRow = {
   modalidade_nome: string | null;
   valor_total_estimado: string | null;
   data_encerramento_proposta: string | null;
+  data_abertura_proposta: string | null;
   data_publicacao_pncp: string | null;
   score_oportunidade: number | null;
   situacao_compra_nome: string | null;
@@ -65,7 +66,7 @@ export async function listLicitacoes(f: LicFilters) {
 
   const sql = `
     select pncp_id, orgao_entidade, unidade_orgao, uf, municipio, subcategoria, modalidade_nome,
-           valor_total_estimado, data_encerramento_proposta, data_publicacao_pncp, score_oportunidade,
+           valor_total_estimado, data_encerramento_proposta, data_abertura_proposta, data_publicacao_pncp, score_oportunidade,
            situacao_compra_nome, resumo, objeto_compra, link,
            (data_encerramento_proposta >= now()) aberta,
            count(*) over() _total
