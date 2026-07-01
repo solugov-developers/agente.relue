@@ -34,11 +34,11 @@ export async function POST(req: NextRequest) {
     )
     .join("\n");
 
-  // baixa e extrai o texto do PDF do edital (se houver)
+  // baixa e extrai o texto dos arquivos do edital (PDF/Word/Excel/ZIP)
   const doc = await fetchEditalTexto(String(l.cnpj_orgao ?? ""), String(l.ano_compra ?? ""), String(l.sequencial_compra ?? ""));
   const docBloco = doc.texto
-    ? `\n\nTEXTO DO ARQUIVO DO EDITAL (${doc.titulo || "edital"} — extraído do PDF):\n${doc.texto}`
-    : `\n\n(Arquivo do edital: ${doc.aviso ?? "não lido"} — responda com base nos dados acima.)`;
+    ? `\n\nCONTEÚDO DOS ARQUIVOS DO EDITAL (extraído de: ${doc.partes.join("; ")}):\n${doc.texto}`
+    : `\n\n(Não consegui ler os arquivos${doc.avisos.length ? ": " + doc.avisos.join("; ") : ""} — responda com base nos dados acima.)`;
 
   const ctx = `EDITAL ${pncpId}
 Órgão: ${l.orgao_entidade} (${l.municipio ?? ""}/${l.uf ?? ""})
