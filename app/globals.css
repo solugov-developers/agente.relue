@@ -253,27 +253,71 @@ body {
 }
 
 /* markdown do chat */
+.md-table {
+  overflow-x: auto;
+  margin: 12px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: hsl(240 14% 8% / 0.55);
+  -webkit-overflow-scrolling: touch;
+}
+.md-table::-webkit-scrollbar {
+  height: 8px;
+}
+.md-table::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 100% / 0.12);
+  border-radius: 8px;
+}
 .md table {
   width: 100%;
   border-collapse: collapse;
-  margin: 8px 0;
+  margin: 0;
   font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
 }
-.md th {
+.md thead th {
   text-align: left;
-  padding: 6px 9px;
-  background: hsl(194 74% 45% / 0.14);
-  border: 1px solid var(--line);
+  padding: 10px 13px;
+  background: hsl(194 74% 42% / 0.15);
   color: var(--ink);
   font-weight: 600;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
 }
-.md td {
-  padding: 6px 9px;
-  border: 1px solid var(--line);
+.md tbody td {
+  padding: 9px 13px;
   color: var(--ink-soft);
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+  line-height: 1.45;
+}
+.md tbody tr:last-child td {
+  border-bottom: 0;
+}
+.md tbody tr:nth-child(even) td {
+  background: hsl(0 0% 100% / 0.018);
+}
+.md tbody tr:hover td {
+  background: hsl(194 74% 45% / 0.07);
 }
 .md a {
   color: var(--blue);
+  text-decoration: underline;
+}
+/* link dentro de tabela vira rótulo compacto */
+.md td a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+  font-weight: 500;
+  vertical-align: bottom;
+}
+.md td a:hover {
   text-decoration: underline;
 }
 .md p {

@@ -216,19 +216,32 @@ export default function RelueChat() {
           </header>
 
           <div className="flex-1 overflow-y-auto px-4 py-4">
-            <div className="mx-auto w-full max-w-3xl space-y-4">
+            <div className="mx-auto w-full max-w-4xl space-y-4">
               {msgs.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                   <div
                     className={
-                      "max-w-[88%] rounded-2xl px-4 py-2.5 text-sm " +
-                      (m.role === "user" ? "bg-[var(--blue)] text-white" : "card text-[var(--ink)]")
+                      "rounded-2xl px-4 py-2.5 text-sm " +
+                      (m.role === "user"
+                        ? "max-w-[88%] bg-[var(--blue)] text-white"
+                        : "w-full max-w-full card text-[var(--ink)]")
                     }
                   >
                     {m.role === "assistant" ? (
                       m.content ? (
                         <div className="md">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              table: ({ children }) => (
+                                <div className="md-table">
+                                  <table>{children}</table>
+                                </div>
+                              ),
+                            }}
+                          >
+                            {m.content}
+                          </ReactMarkdown>
                         </div>
                       ) : (
                         <span className="text-[var(--muted)]">analisando a base…</span>
