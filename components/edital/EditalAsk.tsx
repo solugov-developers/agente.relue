@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { MessageSquareText } from "lucide-react";
 
-const SUG = ["Resuma este edital", "O que está sendo comprado?", "Vale a pena? riscos e pontos de atenção"];
+const SUG = ["Resuma este edital", "O que está sendo comprado?", "Listar habilitação técnica"];
 
 export default function EditalAsk({ pncpId }: { pncpId: string }) {
   const [input, setInput] = useState("");
