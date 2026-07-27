@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, CalendarDays, CalendarClock, ExternalLink, ArrowUpRight } from "lucide-react";
+import { MapPin, CalendarDays, CalendarClock, CalendarCheck, ExternalLink, ArrowUpRight } from "lucide-react";
 import type { LicRow } from "@/lib/licitacoes";
 
 const SUB_COLOR: Record<string, string> = {
@@ -119,6 +119,13 @@ export default function LicitacaoCard({
             <CalendarClock size={13} className="opacity-60" strokeWidth={2} />
             <span className="text-[var(--muted)]/80">Abertura</span>
             <span className="num text-[var(--ink-soft)]">{fmtDate(r.data_abertura_proposta)}</span>
+          </span>
+        )}
+        {r.data_encerramento_proposta && (
+          <span className="inline-flex items-center gap-1.5">
+            <CalendarCheck size={13} className="opacity-60" strokeWidth={2} />
+            <span className="text-[var(--muted)]/80">Encerramento</span>
+            <span className="num text-[var(--ink-soft)]">{fmtDate(r.data_encerramento_proposta)}</span>
           </span>
         )}
       </div>
