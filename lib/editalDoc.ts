@@ -1,5 +1,5 @@
 // Baixa os arquivos do edital no PNCP e extrai texto de PDF, Word (.docx),
-// Excel (.xlsx) e ZIP (descompacta e lê os arquivos suportados de dentro).
+// Excel (.xlsx), ZIP e RAR (descompacta e lê os arquivos suportados de dentro).
 // Roda server-side em região BR (o PNCP recusa IPs de nuvem dos EUA).
 
 const UA =
@@ -73,14 +73,32 @@ async function extractXlsx(buf: Uint8Array): Promise<string> {
   return out;
 }
 
+async function extractRar(buf: Uint8Array, depth = 0): Promise<{ texto: string; aviso?: string }> {
+  const { createExtractorFromData } = await import("node-unrar-js");
+  const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
+  const extractor = await createExtractorFromData({ data: ab });
+  // extrai só o que sabemos ler de dentro do .rar
+  const extracted = extractor.extract({ files: (h) => /\.(pdf|docx|xlsx)$/i.test(h.name) });
+  let out = "";
+  for (const f of extracted.files) {
+    if (out.length > 45000) break;
+    if (f.fileHeader.flags.directory || !f.extraction) continue;
+    const r = await sniffAndExtract(f.extraction, f.fileHeader.name, depth + 1);
+    if (r.texto) out += `\n\n----- ${f.fileHeader.name.split(/[\\/]/).pop()} -----\n` + r.texto;
+  }
+  return { texto: out, aviso: out ? undefined : "rar sem arquivos legíveis (pdf/docx/xlsx)" };
+}
+
 async function sniffAndExtract(buf: Uint8Array, hintName = "", depth = 0): Promise<{ texto: string; aviso?: string }> {
   const ext = (hintName.toLowerCase().match(/\.([a-z0-9]+)$/) || [])[1] || "";
   const isPdf = buf[0] === 0x25 && buf[1] === 0x50; // %PDF
   const isPk = buf[0] === 0x50 && buf[1] === 0x4b; // zip/ooxml
+  const isRar = buf[0] === 0x52 && buf[1] === 0x61 && buf[2] === 0x72 && buf[3] === 0x21; // Rar!
   try {
     if (ext === "pdf" || (isPdf && !ext)) return { texto: await extractPdf(buf) };
     if (ext === "docx") return { texto: await extractDocx(buf) };
     if (ext === "xlsx") return { texto: await extractXlsx(buf) };
+    if (ext === "rar" || isRar) return await extractRar(buf, depth);
     if (ext === "doc") return { texto: "", aviso: ".doc (Word 97-2003) não suportado" };
     if (ext === "xls") return { texto: "", aviso: ".xls (Excel 97-2003) não suportado" };
     if (ext === "zip" || isPk) {
